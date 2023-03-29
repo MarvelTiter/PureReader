@@ -1,0 +1,2 @@
+# PureReader
+Tauri Android 
