@@ -1,0 +1,8 @@
+.nav {
+    display:flex;
+    padding:1em;
+    align-items:center;
+    justify-items:center;
+    justify-content:space-around;
+    background-color:#ccc;
+}

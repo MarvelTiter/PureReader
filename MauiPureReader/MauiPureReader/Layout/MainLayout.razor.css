@@ -1,0 +1,14 @@
+#root-wrapper {
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+#root-wrapper main{
+    height:100%;
+/*    padding:1em;*/
+}
+
+#root-wrapper footer {
+/*    height: 200px;*/
+}

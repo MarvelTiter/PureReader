@@ -1,0 +1,19 @@
+﻿<MBottomNavigation Grow Shift App>
+    <MButton Href=@("bookshelf") IsActive=@CheckActive("bookshelf")>
+        <span>书架</span>
+        <MIcon>mdi-bookshelf</MIcon>
+    </MButton>
+    <MButton Href=@("setting") IsActive=@CheckActive("setting")>
+        <span>设置</span>
+        <MIcon>mdi-cog-outline</MIcon>
+    </MButton>
+</MBottomNavigation>
+
+@code {
+    [Inject] NavigationManager Navigator { get; set; }
+
+    bool CheckActive(string name)
+    {
+        return Navigator.ToBaseRelativePath(Navigator.Uri) == name;
+    }
+}

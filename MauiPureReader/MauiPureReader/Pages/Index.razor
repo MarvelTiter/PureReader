@@ -1,0 +1,9 @@
+﻿@page "/"
+
+@code {
+    [Inject] NavigationManager Navigator { get; set; }
+    protected override void OnInitialized()
+    {
+        Navigator.NavigateTo("/bookshelf");
+    }
+}

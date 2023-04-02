@@ -1,0 +1,17 @@
+﻿@layout RootLayout
+@page "/read/{Id:int}"
+<MAppBar Absolute Show=showAppbar>
+    <MAppBarNavIcon>
+        <MButton>
+            <MIcon>mdi-arrow-left</MIcon>
+        </MButton>
+    </MAppBarNavIcon>
+    <MAppBarTitle>书名</MAppBarTitle>
+</MAppBar>
+@**@
+<div id="content" style="overflow:scroll;max-height:@(showAppbar ? "calc(100vh - 64px)" : "100vh");margin-top:@(showAppbar?"64px":"0px");" @onclick=@(()=>showAppbar = !showAppbar)>
+    @for (int i = 0; i < 100; i++)
+    {
+        <h1>@Id;@i</h1>
+    }
+</div>

@@ -1,0 +1,9 @@
+#content {
+    /*width:300px;*/
+/*    border:0px solid black;*/
+    scrollbar-width: none;
+}
+
+    #content::-webkit-scrollbar {
+/*        display: none;*/
+    }
