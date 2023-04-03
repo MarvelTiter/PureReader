@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="PureReader.Views.Setting"
+<ContentPage x:Class="PureReader.Views.ReadView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="设置">
+             xmlns:vm="clr-namespace:PureReader.ViewModels"
+             Title="ReadView"
+             x:DataType="vm:ReadViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
     <VerticalStackLayout>
         <Label HorizontalOptions="Center"
-               Text="About .NET MAUI!"
+               Text="{Binding Current.Id}"
                VerticalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>

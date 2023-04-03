@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using MDbContext;
 using Microsoft.Data.Sqlite;
-using PureReader.Models;
+using PureReader.ViewModels;
 using PureReader.Views;
 using Shared.Data;
 using Shared.Services;
@@ -28,11 +28,23 @@ namespace PureReader
                     return new SqliteConnection(Constants.DbConnectString);
                 }).InitializedContext<InitContext>();
             });
-            builder.Services.AddTransient<Bookshelf>();
-            builder.Services.AddTransient<BookshelfModel>();
-            builder.Services.AddSingleton<BookService>();
+
+            builder.Services.RegisterViews().RegisterServices();
 
             return builder.Build();
         }
+
+        private static IServiceCollection RegisterViews(this IServiceCollection services)
+        {
+            return services
+                .AddTransient<BookshelfView>().AddTransient<BookshelfViewModel>()
+                .AddTransient<ReadView>().AddTransient<ReadViewModel>();             
+        }
+        private static IServiceCollection RegisterServices(this IServiceCollection services)
+        {
+            return services
+                .AddSingleton<BookService>();
+        }
+
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="PureReader.Views.BookshelfView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:Shared.Data"
+             xmlns:vm="clr-namespace:PureReader.ViewModels"
+             Title="书架"
+             x:DataType="vm:BookshelfViewModel">
+    <ScrollView>
+        <VerticalStackLayout>
+            <HorizontalStackLayout>
+                <Button Command="{Binding GetBooksCommand}" Text="刷新" />
+                <Button Command="{Binding AddBookCommand}" Text="添加" />
+            </HorizontalStackLayout>
+            <CollectionView ItemsSource="{Binding Books}"
+                            SelectionChangedCommand="{Binding BookSelectedCommand}"
+                            SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Book">
+                        <Border>
+                            <Grid Padding="20,10" ColumnDefinitions="*, Auto">
+                                <HorizontalStackLayout>
+                                    <Label Text="{Binding Id}" />
+                                    <Label Text=":" />
+                                    <Label Text="{Binding Title}" />
+                                </HorizontalStackLayout>
+                                <Label Grid.Column="1" Text="{Binding FormatProgress}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

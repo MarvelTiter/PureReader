@@ -56,10 +56,13 @@
 
 	
 	<ItemGroup>
-	  <MauiXaml Update="Views\Setting.xaml">
+	  <MauiXaml Update="Views\ReadView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Bookshelf.xaml">
+	  <MauiXaml Update="Views\SettingView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\BookshelfView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
@@ -74,8 +77,11 @@
 
 	
 	<ItemGroup>
-	  <Compile Update="Views\Setting.xaml.cs">
-	    <DependentUpon>Setting.xaml</DependentUpon>
+	  <Compile Update="Views\BookshelfView.xaml.cs">
+	    <DependentUpon>BookshelfView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\SettingView.xaml.cs">
+	    <DependentUpon>SettingView.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="PureReader.Views.Bookshelf"
+<ContentPage x:Class="PureReader.Views.SettingView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:model="clr-namespace:PureReader.Models"
-             Title="书架"
-             x:DataType="model:BookshelfModel">
-
+             Title="设置">
     <VerticalStackLayout>
         <Label HorizontalOptions="Center"
-               Text="Bookshelf"
+               Text="About .NET MAUI!"
                VerticalOptions="Center" />
-        <Label HorizontalOptions="Center" Text="{Binding Service}" />
     </VerticalStackLayout>
 </ContentPage>

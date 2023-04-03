@@ -34,11 +34,11 @@
 
     <TabBar>
         <ShellContent Title="书架"
-                      ContentTemplate="{DataTemplate views:Bookshelf}"
+                      ContentTemplate="{DataTemplate views:BookshelfView}"
                       Icon="bookshelf"
                       Route="Bookshelf" />
         <ShellContent Title="设置"
-                      ContentTemplate="{DataTemplate views:Setting}"
+                      ContentTemplate="{DataTemplate views:SettingView}"
                       Icon="setting"
                       Route="Setting" />
     </TabBar>

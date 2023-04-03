@@ -27,10 +27,14 @@ namespace Shared.Data
         /// </summary>
         public int Progress { get; set; }
 
-        public string FormatProgress()
+        [Ignore]
+        public string FormatProgress
         {
-            if (BookSize == 0) return 0.ToString("p2");
-            return (Progress*1.0 / BookSize).ToString("p2");
+            get
+            {
+                if (BookSize == 0) return 0.ToString("p2");
+                return (Progress * 1.0 / BookSize).ToString("p2");
+            }
         }
     }
 }

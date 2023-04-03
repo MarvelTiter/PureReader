@@ -7,7 +7,7 @@ namespace PureReader
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute(nameof(Bookshelf), typeof(Bookshelf));
+            Routing.RegisterRoute(nameof(ReadView), typeof(ReadView));
         }
     }
 }
