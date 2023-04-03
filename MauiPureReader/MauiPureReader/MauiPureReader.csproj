@@ -55,4 +55,6 @@
       <PackageReference Include="MT.LightORM" Version="1.2.4" />
     </ItemGroup>
 
+    <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+
 </Project>

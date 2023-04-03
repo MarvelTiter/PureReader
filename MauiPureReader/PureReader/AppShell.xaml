@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="PureReader.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:PureReader"
-    Shell.FlyoutBehavior="Disabled">
+<Shell x:Class="PureReader.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:PureReader"
+       xmlns:views="clr-namespace:PureReader.Views">
+    <!--<FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+        <Tab>
 
-    <ShellContent
+            <ShellContent
+                Title="Home"
+                ContentTemplate="{DataTemplate local:MainPage}"
+                Route="MainPage" />
+            <ShellContent
+        Title="Home2"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+        </Tab>
+        <ShellContent
+        Title="Home3"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+    </FlyoutItem>-->
+    <!--<FlyoutItem>
+        <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
-    <ShellContent
-        Title="Home2"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage2" />
+        <ShellContent
+        Title="About"
+        ContentTemplate="{DataTemplate views:About}"
+        Route="MainPage" />
+    </FlyoutItem>-->
+
+    <TabBar>
+        <ShellContent Title="书架"
+                      ContentTemplate="{DataTemplate views:Bookshelf}"
+                      Icon="bookshelf"
+                      Route="Bookshelf" />
+        <ShellContent Title="设置"
+                      ContentTemplate="{DataTemplate views:Setting}"
+                      Icon="setting"
+                      Route="Setting" />
+    </TabBar>
 </Shell>

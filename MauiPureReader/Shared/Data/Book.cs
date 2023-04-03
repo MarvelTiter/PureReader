@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MauiPureReader.Data
+namespace Shared.Data
 {
     public class Book
     {

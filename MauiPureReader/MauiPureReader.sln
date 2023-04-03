@@ -4,7 +4,9 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MauiPureReader", "MauiPureReader\MauiPureReader.csproj", "{ADF69CEA-D63E-4CE9-8569-6A321E6010BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PureReader", "PureReader\PureReader.csproj", "{1609D918-EABC-4C51-BD65-3FDDADAE19B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PureReader", "PureReader\PureReader.csproj", "{1609D918-EABC-4C51-BD65-3FDDADAE19B8}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{13B1E5FA-8193-44B0-8BDA-5CA729AE2B0F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{13b1e5fa-8193-44b0-8bda-5ca729ae2b0f}*SharedItemsImports = 13
+		Shared\Shared.projitems*{1609d918-eabc-4c51-bd65-3fddadae19b8}*SharedItemsImports = 5
+		Shared\Shared.projitems*{adf69cea-d63e-4ce9-8569-6a321e6010bb}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

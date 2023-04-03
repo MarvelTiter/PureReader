@@ -1,5 +1,5 @@
-﻿using MauiPureReader.Data;
-using MauiPureReader.Services;
+﻿using Shared.Data;
+using Shared.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -16,11 +16,11 @@ namespace MauiPureReader.Pages
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            books = await Service.GetBooks();
+            books = await Service.GetBooks() ?? Enumerable.Empty<Book>().ToList();
         }
         private async Task AddBook()
         {
-            await Service.AddBook(new Data.Book
+            await Service.AddBook(new Book
             {
                 Title = "测试",
                 Progress = 55,

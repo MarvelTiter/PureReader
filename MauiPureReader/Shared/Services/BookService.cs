@@ -1,12 +1,12 @@
-﻿using MauiPureReader.Data;
 using MDbContext.ExpressionSql;
+using Shared.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MauiPureReader.Services
+namespace Shared.Services
 {
     public class BookService
     {

@@ -3,6 +3,8 @@ using MauiPureReader.Data;
 using MauiPureReader.Services;
 using MDbContext;
 using Microsoft.Data.Sqlite;
+using Shared.Data;
+using Shared.Services;
 
 namespace MauiPureReader;
 

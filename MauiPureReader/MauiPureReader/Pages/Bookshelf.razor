@@ -1,11 +1,9 @@
 ﻿@page "/bookshelf"
-@using MauiPureReader.Data;
-@using MauiPureReader.Services;
 
 <MButton OnClick="AddBook">添加</MButton>
 
 <MList>
-    @foreach (var item in books ?? Enumerable.Empty<Book>())
+    @foreach (var item in books)
     {
         <MListItem Href=@($"/read/{item.Id}")>
             <MListItemContent>
