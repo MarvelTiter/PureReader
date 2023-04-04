@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Shared.Data
 {
@@ -21,11 +23,15 @@ namespace Shared.Data
         /// <summary>
         /// 文件大小
         /// </summary>
-        public long BookSize { get; set; }
+        public int BookSize { get; set; }
         /// <summary>
         /// 阅读进度
         /// </summary>
         public int Progress { get; set; }
+        /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string FilePath { get; set; }
 
         [Ignore]
         public string FormatProgress

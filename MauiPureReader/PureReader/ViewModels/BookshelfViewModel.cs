@@ -15,13 +15,21 @@ namespace PureReader.ViewModels;
 public partial class BookshelfViewModel : ObservableObject
 {
     private readonly BookService bookService;
+    private readonly NavigationService navigation;
+    private readonly FileService fileService;
 
-    public BookshelfViewModel(BookService bookService)
+    public BookshelfViewModel(BookService bookService, NavigationService navigation, FileService fileService)
     {
         this.bookService = bookService;
+        this.navigation = navigation;
+        this.fileService = fileService;
+        _ = GetBooks();
     }
     [ObservableProperty]
     private ObservableCollection<Book> books;
+
+    [ObservableProperty]
+    private Book selectedBook;
 
     [RelayCommand]
     private async Task GetBooks()
@@ -33,19 +41,24 @@ public partial class BookshelfViewModel : ObservableObject
     [RelayCommand]
     private async Task AddBook()
     {
-        await bookService.AddBook(new Book
+        var files = await fileService.PickerFilesAsync();
+        if (files == null) return;
+        foreach (var item in files)
         {
-            Title = "测试",
-            Progress = 55,
-        });
+            //var fs = fileService.OpenFileAsync(item.FullPath);
+            await bookService.AddBook(new Book
+            {
+                Title = item.FileName,
+                FilePath = item.FullPath,
+            });
+        }
+        await GetBooks();
     }
 
     [RelayCommand]
-    private Task BookSelected(Book book)
+    private async Task BookSelected()
     {
-        return Shell.Current.GoToAsync(nameof(ReadView),new Dictionary<string, object>
-        {
-            [nameof(ReadViewModel.Current)]=book,
-        });
+        await navigation.NavigateToReadViewAsync(SelectedBook);
+        SelectedBook = null;
     }
 }

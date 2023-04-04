@@ -50,6 +50,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\back.svg" />
 	  <None Remove="Resources\Images\bookshelf.svg" />
 	  <None Remove="Resources\Images\setting.svg" />
 	</ItemGroup>
@@ -73,6 +74,7 @@
 	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 	  <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.15" />
 	  <PackageReference Include="MT.LightORM" Version="1.2.4" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
 	</ItemGroup>
 
 	

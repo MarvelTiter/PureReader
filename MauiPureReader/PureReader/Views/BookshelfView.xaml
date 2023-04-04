@@ -8,24 +8,22 @@
              x:DataType="vm:BookshelfViewModel">
     <ScrollView>
         <VerticalStackLayout>
-            <HorizontalStackLayout>
-                <Button Command="{Binding GetBooksCommand}" Text="刷新" />
+            <HorizontalStackLayout Margin="10">
                 <Button Command="{Binding AddBookCommand}" Text="添加" />
             </HorizontalStackLayout>
+            <!--  SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"  -->
             <CollectionView ItemsSource="{Binding Books}"
+                            SelectedItem="{Binding SelectedBook}"
                             SelectionChangedCommand="{Binding BookSelectedCommand}"
-                            SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"
                             SelectionMode="Single">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Book">
                         <Border>
-                            <Grid Padding="20,10" ColumnDefinitions="*, Auto">
-                                <HorizontalStackLayout>
-                                    <Label Text="{Binding Id}" />
-                                    <Label Text=":" />
-                                    <Label Text="{Binding Title}" />
-                                </HorizontalStackLayout>
-                                <Label Grid.Column="1" Text="{Binding FormatProgress}" />
+                            <Grid Padding="10" ColumnDefinitions="*, Auto">
+                                <Label Text="{Binding Title}" />
+                                <Label Grid.Column="1"
+                                       Margin="10,0,0,0"
+                                       Text="{Binding FormatProgress}" />
                             </Grid>
                         </Border>
                     </DataTemplate>

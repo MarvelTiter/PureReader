@@ -17,6 +17,6 @@ namespace Shared.Data
     {
         public const string DatabaseFilename = "reader.db";
 
-        public static string DbConnectString => $"DataSource={Path.Combine(FileSystem.AppDataDirectory, DatabaseFilename)}";
+        public static string DbConnectString => $"DataSource={Path.Combine(FileSystem.Current.AppDataDirectory, DatabaseFilename)}";
     }
 }

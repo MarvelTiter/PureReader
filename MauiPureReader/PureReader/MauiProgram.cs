@@ -5,6 +5,7 @@ using PureReader.ViewModels;
 using PureReader.Views;
 using Shared.Data;
 using Shared.Services;
+using System.Text;
 
 namespace PureReader
 {
@@ -28,7 +29,7 @@ namespace PureReader
                     return new SqliteConnection(Constants.DbConnectString);
                 }).InitializedContext<InitContext>();
             });
-
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             builder.Services.RegisterViews().RegisterServices();
 
             return builder.Build();
@@ -38,12 +39,15 @@ namespace PureReader
         {
             return services
                 .AddTransient<BookshelfView>().AddTransient<BookshelfViewModel>()
-                .AddTransient<ReadView>().AddTransient<ReadViewModel>();             
+                .AddTransient<ReadView>().AddTransient<ReadViewModel>()             
+                .AddTransient<SettingView>().AddTransient<SettingViewModel>();
         }
         private static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             return services
-                .AddSingleton<BookService>();
+                .AddSingleton<BookService>()
+                .AddSingleton<NavigationService>()
+                .AddSingleton<FileService>();
         }
 
     }

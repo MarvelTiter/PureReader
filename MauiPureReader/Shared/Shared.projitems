@@ -10,6 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Data\Book.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\Content.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\StringEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)services\FileService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\NavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\TxtHandler.cs" />
     <Compile Include="..\Shared\Data\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\BookService.cs" />
   </ItemGroup>
