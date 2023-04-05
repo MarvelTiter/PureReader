@@ -23,7 +23,7 @@ namespace MauiPureReader.Pages
             await Service.AddBook(new Book
             {
                 Title = "测试",
-                Progress = 55,
+                FirstLine = 55,
             });
             books = await Service.GetBooks();
         }

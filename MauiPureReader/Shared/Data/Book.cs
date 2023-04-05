@@ -27,7 +27,12 @@ namespace Shared.Data
         /// <summary>
         /// 阅读进度
         /// </summary>
-        public int Progress { get; set; }
+        public int FirstLine { get; set; }
+        /// <summary>
+        /// 阅读进度
+        /// </summary>
+        public int LastLine { get; set; }
+        public int OffsetLine { get; set; }
         /// <summary>
         /// 文件路径
         /// </summary>
@@ -39,7 +44,7 @@ namespace Shared.Data
             get
             {
                 if (BookSize == 0) return 0.ToString("p2");
-                return (Progress * 1.0 / BookSize).ToString("p2");
+                return (LastLine * 1.0 / BookSize).ToString("p2");
             }
         }
     }

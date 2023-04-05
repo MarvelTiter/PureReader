@@ -22,6 +22,6 @@ public class FileService
 
     public Stream OpenFile(string file)
     {
-        return File.Open(file, FileMode.Open, FileAccess.Read);
+        return File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read);
     }
 }

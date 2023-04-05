@@ -26,5 +26,15 @@ namespace Shared.Services
         {
             await context.Insert<Book>().AppendData(book).IgnoreColumns(b => b.Id).ExecuteAsync();
         }
+
+        public Task UpdateBookInfo(Book book)
+        {
+            return context.Update<Book>().Set(b => b.BookSize, book.BookSize).Where(b => b.Id == book.Id).ExecuteAsync();
+        }
+
+        public Task UpdateBookProgress(Book book)
+        {
+            return context.Update<Book>().Set(b => b.FirstLine, book.FirstLine).Where(b => b.Id == book.Id).ExecuteAsync();
+        }
     }
 }

@@ -1,50 +1,35 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Shared.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PureReader.Base
 {
-    public partial class BaseViewModel : ObservableObject
+    public partial class BaseViewModel : ObservableObject, INavigable
     {
+        public ICommand NavigatedToCommand { get; }
+
+        public ICommand NavigatedFromCommand {get; }
+
         public BaseViewModel()
         {
-            Shell.Current.Unloaded += Current_Unloaded;
-            Shell.Current.Navigated += Current_Navigated;            
+            NavigatedToCommand = new RelayCommand(OnNavigatedTo);
+            NavigatedFromCommand = new RelayCommand(OnNavigatedFrom);
         }
 
-        protected virtual void OnNavigateIn()
+        public virtual void OnNavigatedTo()
         {
-
         }
 
-        protected virtual void OnNavigateOut()
+        public virtual void OnNavigatedFrom()
         {
-
         }
 
-        ShellNavigationState current = null;
-
-        private void Current_Navigated(object sender, ShellNavigatedEventArgs e)
-        {
-            current ??= e.Current;
-            if (e.Current == current)
-            {
-                OnNavigateIn();
-            }
-            else if (e.Previous == current)
-            {
-                OnNavigateOut();
-            }
-        }
-
-        private void Current_Unloaded(object sender, EventArgs e)
-        {
-            Shell.Current.Navigated -= Current_Navigated;
-            Shell.Current.Unloaded -= Current_Unloaded;
-        }
     }
 }

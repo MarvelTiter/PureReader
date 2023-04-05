@@ -1,9 +1,13 @@
-﻿namespace Shared.Data
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace Shared.Data
 {
-    public class Content
+    public partial class Content : ObservableObject
     {
-        public string Text { get; set; }
-        public string Title { get; set; }
+        [ObservableProperty]
+        private string text;
+        [ObservableProperty]
+        private string title;
         public bool IsTitle { get; set; }
         public Content(string text)
         {
