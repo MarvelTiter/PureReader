@@ -25,18 +25,20 @@ namespace PureReader.ViewModels
         [ObservableProperty]
         private string fileContent;
         [ObservableProperty]
-        private ObservableCollection<Content> chapters;
+        private ObservableCollection<Content> contents;
+        Rect ViewRect => Shell.Current.CurrentPage.Bounds;
         public ReadViewModel(FileService fileService, BookService bookService)
         {
             this.fileService = fileService;
             this.bookService = bookService;
-            Chapters = new ObservableCollection<Content>();
+            Contents = new ObservableCollection<Content>();
         }
 
         [RelayCommand]
         private void Tap()
         {
-            Debug.WriteLine("Tap....");
+            Contents.RemoveAt(0);
+
         }
 
         [RelayCommand]
@@ -45,48 +47,66 @@ namespace PureReader.ViewModels
             Debug.WriteLine("Swipe....");
         }
 
-        //double preOffset;
+        int preIndex = 0;
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
-            Debug.WriteLine($"VerticalOffset: {e.VerticalOffset}, VerticalDelta: {e.VerticalDelta}");
-            Debug.WriteLine($"FirstVisibleItemIndex: {e.FirstVisibleItemIndex}, LastVisibleItemIndex: {e.LastVisibleItemIndex}");
-            Debug.WriteLine("=====================================================");
-            Current.FirstLine = e.FirstVisibleItemIndex;
-            Current.LastLine = e.LastVisibleItemIndex;
+            //Debug.WriteLine("=========================Scroll============================");
+            //Debug.WriteLine($"VerticalOffset: {e.VerticalOffset}, VerticalDelta: {e.VerticalDelta}");
+            //Debug.WriteLine($"FirstVisibleItemIndex: {e.FirstVisibleItemIndex}, LastVisibleItemIndex: {e.LastVisibleItemIndex}");
+
+            //Current.FirstLine = e.FirstVisibleItemIndex;
+            //Current.LastLine = e.LastVisibleItemIndex;
+            if (e.VerticalOffset > ViewRect.Height / 2 && e.VerticalDelta > 0)
+            {
+                preIndex += e.CenterItemIndex;
+                Contents.RemoveAt(0);
+                Contents.RemoveAt(0);
+                Contents.RemoveAt(0);
+                Contents.RemoveAt(0);
+                Contents.RemoveAt(0);
+                Render(5);
+            }
             //Render();
             //Debug.WriteLine($"CenterItemIndex:{e.CenterItemIndex}, VerticalOffset: {e.VerticalOffset}");
         }
 
+
         [RelayCommand]
         private void RequestChapters()
         {
-            Debug.WriteLine("=====================================================");
-            Debug.WriteLine(Current.LastLine);
-            Debug.WriteLine("=====================================================");
+            //Debug.WriteLine("========================RemainingItemsThresholdReached=============================");
+            //Debug.WriteLine(Current.LastLine);
+            //Debug.WriteLine("=====================================================");
         }
 
-        List<string> contents = new List<string>();
-       
-        private void Render()
+        [RelayCommand]
+        private void LoadPrevious()
         {
-            var start = Current.FirstLine;
-            var end = Current.LastLine;
-            var count = end - start + 20;
-            var needToRender = contents.Skip(start).Take(count);
-            Chapters.Clear();
+            //Debug.WriteLine("==========================Pull Refresh===========================");
+            //Debug.WriteLine(Current.LastLine);
+            //Debug.WriteLine("=====================================================");
+        }
+
+        List<string> caches = new List<string>();
+
+        private void Render(int appendCount = 100)
+        {
+            var start = preIndex;
+            var count = start + appendCount;
+            var needToRender = caches.Skip(start).Take(count);
             foreach (var item in needToRender)
             {
-                Chapters.Add(new Content(item));
+                Contents.Add(new Content(item));
             }
         }
 
         public override void OnNavigatedTo()
         {
-            Chapters.Clear();
-            contents.Clear();
+            caches.Clear();
+            Contents.Clear();
             using var fs = fileService.OpenFile(Current.FilePath);
-            TxtHandler.Solve(fs, contents);
+            TxtHandler.Solve(fs, caches);
             //Current.BookSize = contents.Count;
             //await bookService.UpdateBookInfo(Current);
             Render();
@@ -96,7 +116,6 @@ namespace PureReader.ViewModels
 
         public override async void OnNavigatedFrom()
         {
-            Chapters.Clear();
             await bookService.UpdateBookProgress(Current);
         }
     }

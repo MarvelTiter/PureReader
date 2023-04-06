@@ -57,6 +57,9 @@
 
 	
 	<ItemGroup>
+	  <MauiXaml Update="Controls\CycleView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\ReadView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

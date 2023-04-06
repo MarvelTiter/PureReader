@@ -9,32 +9,67 @@
              Title="ReadView"
              Padding="10"
              x:DataType="vm:ReadViewModel"
-             Shell.NavBarIsVisible="False"
+             Shell.NavBarIsVisible="True"
              Shell.TabBarIsVisible="False">
     <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />
+        <BackButtonBehavior Command="{Binding TapCommand}" IconOverride="back" />
+        <!--<BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />-->
     </Shell.BackButtonBehavior>
     <ContentPage.Resources>
         <DataTemplate x:Key="LineContent" x:DataType="model:Content">
-            <Label Margin="0,5"
-                   FontSize="18"
-                   Text="{Binding Text}" />
+            <Label FontSize="18"
+                   LineHeight="2"
+                   Text="{Binding Text}"
+                   VerticalTextAlignment="Center" />
         </DataTemplate>
     </ContentPage.Resources>
     <CollectionView x:Name="Scroller"
                     ItemTemplate="{StaticResource LineContent}"
-                    ItemsSource="{Binding Chapters}"
-                    RemainingItemsThreshold="5"
+                    ItemsSource="{Binding Contents}"
+                    RemainingItemsThreshold="1"
                     RemainingItemsThresholdReachedCommand="{Binding RequestChaptersCommand}"
                     VerticalScrollBarVisibility="Never">
+
         <!--<CollectionView.GestureRecognizers>
             <TapGestureRecognizer Command="{Binding TapCommand}" />
             <SwipeGestureRecognizer Command="{Binding SwipeCommand}" Direction="Up,Down" />
         </CollectionView.GestureRecognizers>-->
+
+
         <CollectionView.Behaviors>
             <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
                                             Command="{Binding HandleScrollCommand}"
                                             EventName="Scrolled" />
         </CollectionView.Behaviors>
     </CollectionView>
+    <!--<CarouselView ItemTemplate="{StaticResource LineContent}" ItemsSource="{Binding Chapters}">
+        <CarouselView.Behaviors>
+            <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
+                                            Command="{Binding HandleScrollCommand}"
+                                            EventName="Scrolled" />
+        </CarouselView.Behaviors>
+    </CarouselView>-->
+    <!--<ListView CachingStrategy="RecycleElement"
+              ItemsSource="{Binding Contents}"
+              SelectionMode="None"
+              VerticalScrollBarVisibility="Never">
+        <ListView.Behaviors>
+            <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
+                                            Command="{Binding HandleScrollCommand}"
+                                            EventName="Scrolled" />
+        </ListView.Behaviors>
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="model:Content">
+                <TextCell Text="{Binding Text}" />
+    -->
+    <!--<ViewCell>
+                    <Label FontSize="18"
+                           LineHeight="2"
+                           Text="{Binding Text}"
+                           VerticalOptions="Center" />
+                </ViewCell>-->
+    <!--
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>-->
 </ContentPage>
