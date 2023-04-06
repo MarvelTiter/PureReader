@@ -32,7 +32,7 @@ namespace Shared.Data
         /// 阅读进度
         /// </summary>
         public int LastLine { get; set; }
-        public int OffsetLine { get; set; }
+        public int LineCursor { get; set; }
         /// <summary>
         /// 文件路径
         /// </summary>

@@ -19,16 +19,18 @@ namespace PureReader.Base
 
         public BaseViewModel()
         {
-            NavigatedToCommand = new RelayCommand(OnNavigatedTo);
-            NavigatedFromCommand = new RelayCommand(OnNavigatedFrom);
+            NavigatedToCommand = new AsyncRelayCommand(OnNavigatedTo);
+            NavigatedFromCommand = new AsyncRelayCommand(OnNavigatedFrom);
         }
 
-        public virtual void OnNavigatedTo()
+        public virtual Task OnNavigatedTo()
         {
+            return Task.CompletedTask;
         }
 
-        public virtual void OnNavigatedFrom()
+        public virtual Task OnNavigatedFrom()
         {
+            return Task.CompletedTask;
         }
 
     }

@@ -47,37 +47,28 @@ namespace PureReader.ViewModels
             Debug.WriteLine("Swipe....");
         }
 
-        int preIndex = 0;
+        int preIndex = -1;
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
+
             //Debug.WriteLine("=========================Scroll============================");
             //Debug.WriteLine($"VerticalOffset: {e.VerticalOffset}, VerticalDelta: {e.VerticalDelta}");
             //Debug.WriteLine($"FirstVisibleItemIndex: {e.FirstVisibleItemIndex}, LastVisibleItemIndex: {e.LastVisibleItemIndex}");
-
-            //Current.FirstLine = e.FirstVisibleItemIndex;
-            //Current.LastLine = e.LastVisibleItemIndex;
-            if (e.VerticalOffset > ViewRect.Height / 2 && e.VerticalDelta > 0)
+            if (e.VerticalDelta > 0 && e.FirstVisibleItemIndex != preIndex)
             {
-                preIndex += e.CenterItemIndex;
-                Contents.RemoveAt(0);
-                Contents.RemoveAt(0);
-                Contents.RemoveAt(0);
-                Contents.RemoveAt(0);
-                Contents.RemoveAt(0);
-                Render(5);
+                preIndex = e.FirstVisibleItemIndex;
+                Current.LineCursor++;
             }
-            //Render();
-            //Debug.WriteLine($"CenterItemIndex:{e.CenterItemIndex}, VerticalOffset: {e.VerticalOffset}");
         }
 
 
         [RelayCommand]
         private void RequestChapters()
         {
-            //Debug.WriteLine("========================RemainingItemsThresholdReached=============================");
-            //Debug.WriteLine(Current.LastLine);
-            //Debug.WriteLine("=====================================================");
+            Debug.WriteLine("=========================RemainingItemsThresholdReached============================");
+            Debug.WriteLine($"OffsetLine: {offsetLine}");
+            Render(10);
         }
 
         [RelayCommand]
@@ -90,32 +81,36 @@ namespace PureReader.ViewModels
 
         List<string> caches = new List<string>();
 
-        private void Render(int appendCount = 100)
+        private void Render(int appendCount = 50)
         {
-            var start = preIndex;
-            var count = start + appendCount;
+            var start = offsetLine;
+            var count = appendCount;
             var needToRender = caches.Skip(start).Take(count);
             foreach (var item in needToRender)
             {
                 Contents.Add(new Content(item));
             }
+            offsetLine += count;
         }
-
-        public override void OnNavigatedTo()
+        int offsetLine;
+        public override async Task OnNavigatedTo()
         {
             caches.Clear();
             Contents.Clear();
+            offsetLine = Current.LineCursor;
             using var fs = fileService.OpenFile(Current.FilePath);
-            TxtHandler.Solve(fs, caches);
-            //Current.BookSize = contents.Count;
-            //await bookService.UpdateBookInfo(Current);
+            await TxtHandler.Solve(fs, caches);
+            Current.BookSize = caches.Count;
+            await bookService.UpdateBookInfo(Current);
             Render();
             //await Render(caches);
             //OnContentLoaded?.Invoke(Current.Progress);
         }
 
-        public override async void OnNavigatedFrom()
+        public override async Task OnNavigatedFrom()
         {
+            caches.Clear();
+            Contents.Clear();
             await bookService.UpdateBookProgress(Current);
         }
     }

@@ -28,10 +28,9 @@ public partial class BookshelfViewModel : BaseViewModel
         this.bookService = bookService;
         this.navigation = navigation;
         this.fileService = fileService;
-        Debug.WriteLine(new Random().Next(1, 10000));
     }
 
-    public override async void OnNavigatedTo()
+    public override async Task OnNavigatedTo()
     {
         await GetBooks();
     }

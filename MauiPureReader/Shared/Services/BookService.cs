@@ -34,7 +34,7 @@ namespace Shared.Services
 
         public Task UpdateBookProgress(Book book)
         {
-            return context.Update<Book>().Set(b => b.FirstLine, book.FirstLine).Where(b => b.Id == book.Id).ExecuteAsync();
+            return context.Update<Book>().Set(b => b.LineCursor, book.LineCursor).Where(b => b.Id == book.Id).ExecuteAsync();
         }
     }
 }

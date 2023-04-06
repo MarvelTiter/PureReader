@@ -6,7 +6,7 @@ namespace Shared.Services
     {
         ICommand NavigatedToCommand { get; }
         ICommand NavigatedFromCommand { get; }
-        void OnNavigatedTo();
-        void OnNavigatedFrom();
+        Task OnNavigatedTo();
+        Task OnNavigatedFrom();
     }
 }

@@ -9,7 +9,7 @@ namespace Shared.Utils
 {
     public class TxtHandler
     {
-        public static void Solve(Stream fs, IList<string> collection)
+        public static async Task Solve(Stream fs, IList<string> collection)
         {
             StreamReader sr = null;
             try
@@ -38,14 +38,14 @@ namespace Shared.Utils
                         sr = new StreamReader(fs, Encoding.GetEncoding("GBK"));
                     }
                 }
-                string line =  sr.ReadLine();
+                string line =  await sr.ReadLineAsync();
                 while (line != null)
                 {
                     if (!string.IsNullOrWhiteSpace(line))
                     {
                         collection.Add(line);
                     }
-                    line = sr.ReadLine();
+                    line = await sr.ReadLineAsync();
                 }
             }
             catch (Exception ex)

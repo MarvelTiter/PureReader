@@ -9,11 +9,11 @@
              Title="ReadView"
              Padding="10"
              x:DataType="vm:ReadViewModel"
-             Shell.NavBarIsVisible="True"
+             Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="False">
     <Shell.BackButtonBehavior>
-        <BackButtonBehavior Command="{Binding TapCommand}" IconOverride="back" />
-        <!--<BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />-->
+        <!--<BackButtonBehavior Command="{Binding TapCommand}" IconOverride="back" />-->
+        <BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />
     </Shell.BackButtonBehavior>
     <ContentPage.Resources>
         <DataTemplate x:Key="LineContent" x:DataType="model:Content">
@@ -28,6 +28,7 @@
                     ItemsSource="{Binding Contents}"
                     RemainingItemsThreshold="1"
                     RemainingItemsThresholdReachedCommand="{Binding RequestChaptersCommand}"
+                    Scrolled="Scroller_Scrolled"
                     VerticalScrollBarVisibility="Never">
 
         <!--<CollectionView.GestureRecognizers>
