@@ -32,11 +32,28 @@ namespace Shared.Data
         /// 阅读进度
         /// </summary>
         public int LastLine { get; set; }
-        public int LineCursor { get; set; }
+
+        private int lineCursor = -1;
+        public int LineCursor
+        {
+            get => lineCursor; set
+            {
+                if (value < 0) value = 0;
+                lineCursor = value;
+            }
+        }
         /// <summary>
         /// 文件路径
         /// </summary>
         public string FilePath { get; set; }
+        /// <summary>
+        /// MD5
+        /// </summary>
+        public string MD5 { get; set; }
+        /// <summary>
+        /// 是否解析完成
+        /// </summary>
+        public bool Done { get; set; }
 
         [Ignore]
         public string FormatProgress
@@ -44,7 +61,7 @@ namespace Shared.Data
             get
             {
                 if (BookSize == 0) return 0.ToString("p2");
-                return (LastLine * 1.0 / BookSize).ToString("p2");
+                return (LineCursor * 1.0 / BookSize).ToString("p2");
             }
         }
     }

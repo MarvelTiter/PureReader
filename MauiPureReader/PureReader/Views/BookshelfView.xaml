@@ -8,15 +8,12 @@
              Title="书架"
              x:DataType="vm:BookshelfViewModel">
     <ScrollView>
-        <VerticalStackLayout>
-            <HorizontalStackLayout Margin="10">
-                <Button Command="{Binding AddBookCommand}" Text="添加" />
-            </HorizontalStackLayout>
+        <Grid Padding="10" RowDefinitions="*,Auto">
             <!--  SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"  -->
             <CollectionView ItemsSource="{Binding Books}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Book">
-                        <Border>
+                        <Border StrokeThickness="1">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookshelfViewModel}}, Path=BookTappedCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
@@ -30,7 +27,12 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </VerticalStackLayout>
+            <HorizontalStackLayout Grid.Row="1"
+                                   Margin="10"
+                                   HorizontalOptions="Center">
+                <Button Command="{Binding AddBookCommand}" Text="添加" />
+            </HorizontalStackLayout>
+        </Grid>
     </ScrollView>
 
 </ContentPage>

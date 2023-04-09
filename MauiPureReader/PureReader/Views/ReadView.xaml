@@ -3,6 +3,7 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:model="clr-namespace:Shared.Data"
+             xmlns:sel="clr-namespace:PureReader.TemplateSelectors"
              xmlns:service="clr-namespace:Shared.Services"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:vm="clr-namespace:PureReader.ViewModels"
@@ -17,60 +18,34 @@
     </Shell.BackButtonBehavior>
     <ContentPage.Resources>
         <DataTemplate x:Key="LineContent" x:DataType="model:Content">
-            <Label FontSize="18"
-                   LineHeight="2"
+            <Label CharacterSpacing="2"
+                   FontAutoScalingEnabled="False"
+                   FontSize="18"
+                   LineHeight="1"
                    Text="{Binding Text}"
                    VerticalTextAlignment="Center" />
         </DataTemplate>
+        <DataTemplate x:Key="TitleContent" x:DataType="model:Content">
+            <Label FontSize="22"
+                   LineHeight="3"
+                   Text="{Binding Text}"
+                   VerticalTextAlignment="Center" />
+        </DataTemplate>
+        <sel:LineSelector x:Key="LineSelector"
+                          LineContentTemplate="{StaticResource LineContent}"
+                          TitleTemplate="{StaticResource TitleContent}" />
     </ContentPage.Resources>
-    <CollectionView x:Name="Scroller"
-                    ItemTemplate="{StaticResource LineContent}"
-                    ItemsSource="{Binding Contents}"
-                    RemainingItemsThreshold="1"
-                    RemainingItemsThresholdReachedCommand="{Binding RequestChaptersCommand}"
-                    Scrolled="Scroller_Scrolled"
-                    VerticalScrollBarVisibility="Never">
-
-        <!--<CollectionView.GestureRecognizers>
-            <TapGestureRecognizer Command="{Binding TapCommand}" />
-            <SwipeGestureRecognizer Command="{Binding SwipeCommand}" Direction="Up,Down" />
-        </CollectionView.GestureRecognizers>-->
-
-
-        <CollectionView.Behaviors>
-            <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
-                                            Command="{Binding HandleScrollCommand}"
-                                            EventName="Scrolled" />
-        </CollectionView.Behaviors>
-    </CollectionView>
-    <!--<CarouselView ItemTemplate="{StaticResource LineContent}" ItemsSource="{Binding Chapters}">
-        <CarouselView.Behaviors>
-            <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
-                                            Command="{Binding HandleScrollCommand}"
-                                            EventName="Scrolled" />
-        </CarouselView.Behaviors>
-    </CarouselView>-->
-    <!--<ListView CachingStrategy="RecycleElement"
-              ItemsSource="{Binding Contents}"
-              SelectionMode="None"
-              VerticalScrollBarVisibility="Never">
-        <ListView.Behaviors>
-            <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
-                                            Command="{Binding HandleScrollCommand}"
-                                            EventName="Scrolled" />
-        </ListView.Behaviors>
-        <ListView.ItemTemplate>
-            <DataTemplate x:DataType="model:Content">
-                <TextCell Text="{Binding Text}" />
-    -->
-    <!--<ViewCell>
-                    <Label FontSize="18"
-                           LineHeight="2"
-                           Text="{Binding Text}"
-                           VerticalOptions="Center" />
-                </ViewCell>-->
-    <!--
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>-->
+    <Grid>
+        <ActivityIndicator IsRunning="{Binding Loading}" />
+        <CollectionView x:Name="Scroller"
+                        ItemTemplate="{StaticResource LineContent}"
+                        ItemsSource="{Binding Contents}"
+                        VerticalScrollBarVisibility="Never">
+            <CollectionView.Behaviors>
+                <toolkit:EventToCommandBehavior x:TypeArguments="ItemsViewScrolledEventArgs"
+                                                Command="{Binding HandleScrollCommand}"
+                                                EventName="Scrolled" />
+            </CollectionView.Behaviors>
+        </CollectionView>
+    </Grid>
 </ContentPage>

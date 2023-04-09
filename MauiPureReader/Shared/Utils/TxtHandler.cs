@@ -9,12 +9,12 @@ namespace Shared.Utils
 {
     public class TxtHandler
     {
-        public static async Task Solve(Stream fs, IList<string> collection)
+        public static async Task Solve(Stream fs, IList<Content> collection)
         {
             StreamReader sr = null;
             try
             {
-                sr = new StreamReader(fs);                
+                sr = new StreamReader(fs);
                 if (sr.CurrentEncoding == Encoding.UTF8)
                 {
                     var chArr = new char[1024];
@@ -38,14 +38,16 @@ namespace Shared.Utils
                         sr = new StreamReader(fs, Encoding.GetEncoding("GBK"));
                     }
                 }
-                string line =  await sr.ReadLineAsync();
-                while (line != null)
+                var buffer = new byte[fs.Length];
+                fs.Read(buffer, 0, buffer.Length);
+                sr = new StreamReader(new MemoryStream(buffer), Encoding.GetEncoding("GBK"));
+                while (sr.Peek() > -1 )
                 {
+                    var line = await sr.ReadLineAsync();
                     if (!string.IsNullOrWhiteSpace(line))
                     {
-                        collection.Add(line);
+                        collection.Add(new Content(line));
                     }
-                    line = await sr.ReadLineAsync();
                 }
             }
             catch (Exception ex)
@@ -87,14 +89,15 @@ namespace Shared.Utils
                         sr = new StreamReader(fs, Encoding.GetEncoding("GBK"));
                     }
                 }
-                string line = await sr.ReadLineAsync();
-                while (line != null)
+                //var all = await sr.ReadToEndAsync();
+                while (sr.Peek() > -1)
                 {
+                    string line = await sr.ReadLineAsync();
                     if (!string.IsNullOrWhiteSpace(line))
                     {
                         collection.Add(new Content(line));
                     }
-                    line = await sr.ReadLineAsync();
+                    //line = await sr.ReadLineAsync();
                 }
             }
             catch (Exception ex)

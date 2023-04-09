@@ -4,34 +4,6 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:local="clr-namespace:PureReader"
        xmlns:views="clr-namespace:PureReader.Views">
-    <!--<FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
-        <Tab>
-
-            <ShellContent
-                Title="Home"
-                ContentTemplate="{DataTemplate local:MainPage}"
-                Route="MainPage" />
-            <ShellContent
-        Title="Home2"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-        </Tab>
-        <ShellContent
-        Title="Home3"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-    </FlyoutItem>-->
-    <!--<FlyoutItem>
-        <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-        <ShellContent
-        Title="About"
-        ContentTemplate="{DataTemplate views:About}"
-        Route="MainPage" />
-    </FlyoutItem>-->
-
     <TabBar>
         <ShellContent Title="书架"
                       ContentTemplate="{DataTemplate views:BookshelfView}"
