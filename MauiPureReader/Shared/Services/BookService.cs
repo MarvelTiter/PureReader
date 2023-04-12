@@ -1,3 +1,4 @@
+using DExpSql;
 using MDbContext.ExpressionSql;
 using Shared.Data;
 using System;
@@ -29,12 +30,38 @@ namespace Shared.Services
 
         public Task UpdateBookInfo(Book book)
         {
-            return context.Update<Book>().Set(b => b.BookSize, book.BookSize).Where(b => b.Id == book.Id).ExecuteAsync();
+            return context.Update<Book>()
+                .Set(b => b.BookSize, book.BookSize)
+                .Set(b => b.CacheIndex, book.CacheIndex)
+                .Where(b => b.Id == book.Id).ExecuteAsync();
         }
 
         public Task UpdateBookProgress(Book book)
         {
             return context.Update<Book>().Set(b => b.LineCursor, book.LineCursor).Where(b => b.Id == book.Id).ExecuteAsync();
+        }
+
+        public async Task<IList<Content>> GetBookContents(string bookId, int start, int count)
+        {
+            var end = start + count;
+            var contents = await context.Select<Content>()
+                .Where(c => c.BookId == bookId && c.LineIndex >= start && c.LineIndex < end)
+                .OrderBy(c => c.LineIndex, true)
+                .ToListAsync();
+            return contents;
+        }
+
+        public Task<int> SaveContents(IEnumerable<Content> contents)
+        {
+            return context.Insert<Content>().AppendData(contents).ExecuteAsync();
+        }
+
+        public async Task DeleteBookAsync(Book book)
+        {
+            var trans = context.BeginTransaction();
+            trans.Delete<Book>().Where(b => b.Id == book.Id).AttachTransaction();
+            trans.Delete<Content>().Where(c => c.BookId == book.Id).AttachTransaction();
+            await trans.CommitTransactionAsync();
         }
     }
 }

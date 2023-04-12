@@ -6,6 +6,7 @@ using PureReader.ViewModels;
 using PureReader.Views;
 using Shared.Data;
 using Shared.Services;
+using Shared.Utils;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -51,7 +52,7 @@ namespace PureReader
             services.AddTransient(provider =>
             {
                 var viewModel = provider.GetService<ViewModel>();
-                var ctor = typeof(View).GetConstructor(new Type[] {typeof(ViewModel)});                
+                var ctor = typeof(View).GetConstructor(new Type[] { typeof(ViewModel) });
                 var page = (View)ctor.Invoke(new object[] { viewModel });
                 if (viewModel is INavigable navigable)
                 {
@@ -76,7 +77,8 @@ namespace PureReader
             return services
                 .AddSingleton<BookService>()
                 .AddSingleton<NavigationService>()
-                .AddSingleton<FileService>();
+                .AddSingleton<FileService>()
+                .AddSingleton<IFileHandler, TxtHandler>();
         }
 
     }

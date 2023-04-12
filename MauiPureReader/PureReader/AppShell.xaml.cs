@@ -13,6 +13,26 @@ namespace PureReader
             Routing.RegisterRoute(nameof(ReadView), typeof(ReadView));
             //Navigating += AppShell_Navigating;
             //Navigated += AppShell_Navigated;
+            Appearing += AppShell_Appearing;
+            Disappearing += AppShell_Disappearing;
+        }
+
+        private void AppShell_Appearing(object sender, EventArgs e)
+        {
+            //Debug.WriteLine($"{CurrentPage?.GetType().Name} Appearing");
+            if (CurrentPage?.BindingContext is IAppearingPage appearing)
+            {
+                appearing.OnAppearing();
+            }
+        }
+
+        private void AppShell_Disappearing(object sender, EventArgs e)
+        {
+            //Debug.WriteLine($"{CurrentPage?.GetType().Name} Disappearing");
+            if (CurrentPage?.BindingContext is IDisappearingPage disappearing)
+            {
+                disappearing.OnDisappearing();
+            }
         }
 
         private void AppShell_Navigating(object sender, ShellNavigatingEventArgs e)

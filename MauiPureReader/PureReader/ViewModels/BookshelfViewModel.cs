@@ -1,14 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using PureReader.Base;
+using PureReader.EventHub;
 using PureReader.Views;
 using Shared.Data;
 using Shared.Services;
+using Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,12 +32,17 @@ public partial class BookshelfViewModel : BaseViewModel
         this.bookService = bookService;
         this.navigation = navigation;
         this.fileService = fileService;
+        this.Register<BookshelfViewModel, bool>("OnNavigatedBackFromReadView", finish =>
+        {
+            _ = GetBooks();
+        });
+        _ = GetBooks();
     }
 
-    public override async Task OnNavigatedTo()
-    {
-        await GetBooks();
-    }
+    //public override async Task OnNavigatedTo()
+    //{
+    //    await GetBooks();
+    //}
 
     [RelayCommand]
     private async Task GetBooks()
@@ -52,6 +61,7 @@ public partial class BookshelfViewModel : BaseViewModel
             //var fs = fileService.OpenFileAsync(item.FullPath);
             await bookService.AddBook(new Book
             {
+                Id = await item.GetFileMd5Value(),
                 Title = item.FileName,
                 FilePath = item.FullPath,
             });
@@ -63,5 +73,12 @@ public partial class BookshelfViewModel : BaseViewModel
     private async Task BookTapped(Book book)
     {
         await navigation.NavigateToReadViewAsync(book);
+    }
+
+    [RelayCommand]
+    private async Task DeleteBook(Book book)
+    {
+        await bookService.DeleteBookAsync(book);
+        await GetBooks();
     }
 }

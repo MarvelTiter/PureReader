@@ -11,12 +11,20 @@ namespace Shared.Data
         public override void Initialized(IDbInitial db)
         {
             db.CreateTable<Book>();
+            db.CreateTable<Content>();
         }
     }
     public static class Constants
     {
         public const string DatabaseFilename = "reader.db";
 
-        public static string DbConnectString => $"DataSource={Path.Combine(FileSystem.Current.AppDataDirectory, DatabaseFilename)}";
+        public static string DbConnectString
+        {
+            get
+            {
+                var connStr = $"DataSource={Path.Combine(FileSystem.Current.AppDataDirectory, DatabaseFilename)}";
+                return connStr;
+            }
+        }
     }
 }

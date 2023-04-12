@@ -12,9 +12,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Data\Book.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Content.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\StringEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ChapterService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\FileService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\INavigable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\FileResultExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\StreamReaderWithRealPosition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TxtHandler.cs" />
     <Compile Include="..\Shared\Data\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\BookService.cs" />

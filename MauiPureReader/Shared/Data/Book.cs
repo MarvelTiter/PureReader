@@ -12,10 +12,10 @@ namespace Shared.Data
     public class Book
     {
         /// <summary>
-        /// 主键ID
+        /// 主键ID (MD5)
         /// </summary>
-        [Column(PrimaryKey = true, AutoIncrement = true)]
-        public int Id { get; set; }
+        [Column(PrimaryKey = true)]
+        public string Id { get; set; }
         /// <summary>
         /// 书名
         /// </summary>
@@ -24,14 +24,6 @@ namespace Shared.Data
         /// 文件大小
         /// </summary>
         public int BookSize { get; set; }
-        /// <summary>
-        /// 阅读进度
-        /// </summary>
-        public int FirstLine { get; set; }
-        /// <summary>
-        /// 阅读进度
-        /// </summary>
-        public int LastLine { get; set; }
 
         private int lineCursor = -1;
         public int LineCursor
@@ -46,14 +38,17 @@ namespace Shared.Data
         /// 文件路径
         /// </summary>
         public string FilePath { get; set; }
+
         /// <summary>
-        /// MD5
+        /// 已缓存索引
         /// </summary>
-        public string MD5 { get; set; }
+        public int CacheIndex { get; set; }
+
         /// <summary>
         /// 是否解析完成
         /// </summary>
-        public bool Done { get; set; }
+        [Ignore]
+        public bool Done { get => CacheIndex == BookSize && BookSize > 0 && CacheIndex > 0; }
 
         [Ignore]
         public string FormatProgress

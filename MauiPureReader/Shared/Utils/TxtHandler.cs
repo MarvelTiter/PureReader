@@ -1,4 +1,7 @@
-﻿using Shared.Data;
+﻿using Microsoft.Maui.Controls.Shapes;
+using Microsoft.VisualBasic;
+using Shared.Data;
+using Shared.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,8 +10,15 @@ using System.Text;
 
 namespace Shared.Utils
 {
-    public class TxtHandler
+    public interface IFileHandler
     {
+        Task Solve(Book book, CancellationToken token);
+    }
+    public class TxtHandler : IFileHandler
+    {
+        private readonly BookService bookService;
+        private readonly FileService fileService;
+
         public static async Task Solve(Stream fs, IList<Content> collection)
         {
             StreamReader sr = null;
@@ -41,7 +51,7 @@ namespace Shared.Utils
                 var buffer = new byte[fs.Length];
                 fs.Read(buffer, 0, buffer.Length);
                 sr = new StreamReader(new MemoryStream(buffer), Encoding.GetEncoding("GBK"));
-                while (sr.Peek() > -1 )
+                while (sr.Peek() > -1)
                 {
                     var line = await sr.ReadLineAsync();
                     if (!string.IsNullOrWhiteSpace(line))
@@ -108,6 +118,107 @@ namespace Shared.Utils
             {
                 sr?.Dispose();
             }
+        }
+
+        public TxtHandler(BookService bookService, FileService fileService)
+        {
+            this.bookService = bookService;
+            this.fileService = fileService;
+        }
+
+        public Task Solve(Book book, CancellationToken token)
+        {
+            return Task.Run(async () =>
+            {
+                var fs = fileService.OpenFile(book.FilePath);
+                StreamReaderWithRealPosition sr = null;
+                List<Content> temp = new();
+                try
+                {
+                    sr = OpenStreamWithEncoding(fs);
+                    sr.Seek(60);
+                    //List<string> top50 = new List<string>();
+                    for (int i = 0; i < 50000; i++)
+                    {
+                        //top50.Add(sr.ReadLine());
+                        var charInt = sr.ReadLine();
+                        var pos = sr.Position;
+                    }
+                    var all = sr.ReadToEnd();
+                    var allLines = all.Split("\n");
+                    book.BookSize = allLines.Length;
+                    for (int i = book.CacheIndex; i < allLines.Length; i++)
+                    {
+                        if (token.IsCancellationRequested)
+                        {
+                            break;
+                        }
+                        var line = allLines[i];
+                        var match = line.ExtractChapter();
+                        if (match.Success)
+                        {
+
+                        }
+                        temp.Add(new Content
+                        {
+                            BookId = book.Id,
+                            LineIndex = i,
+                            Text = line,
+                            IsTitle = match.Success,
+                        });
+                        book.CacheIndex++;
+                        if (temp.Count == 10)
+                        {
+                            await bookService.SaveContents(temp);
+                            temp.Clear();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _ = Shell.Current.DisplayAlert("文件打开异常", ex.Message, "ok");
+                }
+                finally
+                {
+                    sr?.Dispose();
+                    fs?.Dispose();
+                    if (temp.Count > 0)
+                    {
+                        await bookService.SaveContents(temp);
+                    }
+                    await bookService.UpdateBookInfo(book);
+                }
+            }, token);
+        }
+
+        private static StreamReaderWithRealPosition OpenStreamWithEncoding(Stream fs)
+        {
+            var sr = new StreamReader(fs);
+            var encoding = sr.CurrentEncoding;
+            if (sr.CurrentEncoding == Encoding.UTF8)
+            {
+                var chArr = new char[1024];
+                sr.Read(chArr, 0, chArr.Length);
+                var buffer1 = Encoding.UTF8.GetBytes(chArr);
+                var buffer2 = new byte[buffer1.Length];
+                fs.Position = 0;
+                fs.Read(buffer2, 0, buffer2.Length);
+                var same = true;
+                for (int i = 0; i < buffer1.Length; i++)
+                {
+                    if (buffer1[i] != buffer2[i])
+                    {
+                        same = false;
+                        break;
+                    }
+                }
+                if (!same)
+                {
+                    fs.Position = 0;
+                    return new StreamReaderWithRealPosition(fs, Encoding.GetEncoding("GBK"));
+                }
+            }
+            return new StreamReaderWithRealPosition(fs, encoding);
         }
     }
 }

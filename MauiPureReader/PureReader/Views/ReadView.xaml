@@ -16,6 +16,9 @@
         <!--<BackButtonBehavior Command="{Binding TapCommand}" IconOverride="back" />-->
         <BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />
     </Shell.BackButtonBehavior>
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="Transparent" StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
     <ContentPage.Resources>
         <DataTemplate x:Key="LineContent" x:DataType="model:Content">
             <Label CharacterSpacing="2"
@@ -36,7 +39,9 @@
                           TitleTemplate="{StaticResource TitleContent}" />
     </ContentPage.Resources>
     <Grid>
-        <ActivityIndicator IsRunning="{Binding Loading}" />
+        <ActivityIndicator IsRunning="{Binding Loading}"
+                           WidthRequest="100"
+                           Color="{StaticResource Primary}" />
         <CollectionView x:Name="Scroller"
                         ItemTemplate="{StaticResource LineContent}"
                         ItemsSource="{Binding Contents}"

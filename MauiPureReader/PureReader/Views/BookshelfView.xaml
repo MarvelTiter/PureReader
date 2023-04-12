@@ -3,36 +3,44 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:model="clr-namespace:Shared.Data"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:vm="clr-namespace:PureReader.ViewModels"
              x:Name="self"
              Title="书架"
              x:DataType="vm:BookshelfViewModel">
-    <ScrollView>
-        <Grid Padding="10" RowDefinitions="*,Auto">
-            <!--  SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"  -->
-            <CollectionView ItemsSource="{Binding Books}" SelectionMode="None">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Book">
-                        <Border StrokeThickness="1">
+    <Grid Padding="10" RowDefinitions="*,Auto">
+        <!--  SelectionChangedCommandParameter="{Binding Source={RelativeSource Mode=Self}, Path=SelectedItem}"  -->
+        <CollectionView ItemsSource="{Binding Books}" SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Book">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem BackgroundColor="LightCoral"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookshelfViewModel}}, Path=DeleteBookCommand}"
+                                           CommandParameter="{Binding .}"
+                                           IconImageSource="delete.svg" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Border BackgroundColor="Transparent" StrokeThickness="0">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookshelfViewModel}}, Path=BookTappedCommand}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
-                            <Grid Padding="10" ColumnDefinitions="*, Auto">
-                                <Label Text="{Binding Title}" />
+                            <Grid Padding="10,30" ColumnDefinitions="*, Auto">
+                                <Label FontAttributes="Bold" Text="{Binding Title}" />
                                 <Label Grid.Column="1"
                                        Margin="10,0,0,0"
                                        Text="{Binding FormatProgress}" />
                             </Grid>
                         </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-            <HorizontalStackLayout Grid.Row="1"
-                                   Margin="10"
-                                   HorizontalOptions="Center">
-                <Button Command="{Binding AddBookCommand}" Text="添加" />
-            </HorizontalStackLayout>
-        </Grid>
-    </ScrollView>
-
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <HorizontalStackLayout Grid.Row="1"
+                               Margin="10"
+                               HorizontalOptions="Center">
+            <Button Command="{Binding AddBookCommand}" Text="添加" />
+        </HorizontalStackLayout>
+    </Grid>
 </ContentPage>

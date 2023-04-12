@@ -4,9 +4,11 @@ namespace Shared.Data
 {
     public class Chapter
     {
+        public int Id { get; set; }
         public string BookId { get; set; }
-        public int ChapterId { get; set; }
-        public int MyProperty { get; set; }
+        public string Title { get; set; }
+        public int StartIndex { get; set; }
+        public int EndIndex { get; set; }
     }
     public class Content
     {
@@ -19,6 +21,10 @@ namespace Shared.Data
             var matchResult = text.ExtractChapter();
             IsTitle = matchResult.Success;
             Text = text;
+        }
+        public Content()
+        {
+            
         }
     }
 }

@@ -9,4 +9,14 @@ namespace Shared.Services
         Task OnNavigatedTo();
         Task OnNavigatedFrom();
     }
+
+    public interface IDisappearingPage
+    {
+        Task OnDisappearing();
+    }
+
+    public interface IAppearingPage
+    {
+        Task OnAppearing();
+    }
 }
