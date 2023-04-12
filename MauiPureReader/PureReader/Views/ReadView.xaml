@@ -25,7 +25,7 @@
                    FontAutoScalingEnabled="False"
                    FontSize="18"
                    LineHeight="1"
-                   Text="{Binding Text}"
+                   Text="{Binding LineIndex}"
                    VerticalTextAlignment="Center" />
         </DataTemplate>
         <DataTemplate x:Key="TitleContent" x:DataType="model:Content">

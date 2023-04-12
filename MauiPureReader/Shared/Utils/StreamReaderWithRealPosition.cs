@@ -208,6 +208,26 @@ namespace Shared.Utils
             //Console.WriteLine("ReadBuffer called.  chars: "+charLen);
             return charLen;
         }
+        public new bool EndOfStream
+        {
+            get
+            {
+                if (charPos < charLen)
+                    return false;
+
+                // This may block on pipes!
+                int numRead = ReadBuffer();
+                return numRead == 0;
+            }
+        }
+        public override int Peek()
+        {
+            if (charPos == charLen)
+            {
+                if (ReadBuffer() == 0) return -1;
+            }
+            return charBuffer[charPos];
+        }
 
 
         public override string ReadLine()

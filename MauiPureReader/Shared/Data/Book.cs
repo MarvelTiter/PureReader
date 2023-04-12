@@ -23,7 +23,7 @@ namespace Shared.Data
         /// <summary>
         /// 文件大小
         /// </summary>
-        public int BookSize { get; set; }
+        public long BookSize { get; set; }
 
         private int lineCursor = -1;
         public int LineCursor
@@ -40,23 +40,27 @@ namespace Shared.Data
         public string FilePath { get; set; }
 
         /// <summary>
-        /// 已缓存索引
+        /// 已缓存流位置
         /// </summary>
-        public int CacheIndex { get; set; }
-
+        public long Offset { get; set; }
+        /// <summary>
+        /// 已缓存文本行数
+        /// </summary>
+        public int Lines { get; set; }
         /// <summary>
         /// 是否解析完成
         /// </summary>
         [Ignore]
-        public bool Done { get => CacheIndex == BookSize && BookSize > 0 && CacheIndex > 0; }
+        public bool Done { get => Offset == BookSize && BookSize > 0 && Offset > 0; }
 
         [Ignore]
         public string FormatProgress
         {
             get
             {
-                if (BookSize == 0) return 0.ToString("p2");
-                return (LineCursor * 1.0 / BookSize).ToString("p2");
+                if (BookSize == 0) return "未读";
+                else if (!Done) return "解析中";
+                else return (LineCursor * 1.0 / Lines).ToString("p2");
             }
         }
     }

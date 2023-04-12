@@ -48,7 +48,6 @@ namespace PureReader.ViewModels
         {
             //Debug.WriteLine("=========================Scroll============================");
             //Debug.WriteLine($"VerticalOffset: {e.VerticalOffset}, VerticalDelta: {e.VerticalDelta}");
-            if (DeletingOnHead) return;
             if (e.FirstVisibleItemIndex != preIndex)
             {
                 //Debug.WriteLine($"FirstVisibleItemIndex: {e.FirstVisibleItemIndex}, LastVisibleItemIndex: {e.LastVisibleItemIndex}");
@@ -56,12 +55,12 @@ namespace PureReader.ViewModels
                 if (e.VerticalDelta > 0)
                 {
                     Current.LineCursor++;
-                    CheckRemainAndLoad(e.LastVisibleItemIndex);
+                    CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
                 }
                 else
                 {
                     Current.LineCursor--;
-                    CheckPreviousAndLoad(e.FirstVisibleItemIndex);
+                    CheckPreviousAndLoad(e.FirstVisibleItemIndex, e.VerticalDelta);
                 }
                 //Debug.WriteLine($"LineCursor: {Current.LineCursor}, ContentCount: {ContentCount}");
             }
@@ -71,9 +70,9 @@ namespace PureReader.ViewModels
         /// </summary>
         /// <param name="lastVisibleItemIndex"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void CheckRemainAndLoad(int lastVisibleItemIndex)
+        private void CheckRemainAndLoad(int lastVisibleItemIndex, double delta)
         {
-            if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
+            if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT && delta < 20 && !deletingOnHead)
             {
                 RenderForward(10);
                 if (ContentCount > MAX_CONTENT)
@@ -82,9 +81,9 @@ namespace PureReader.ViewModels
                 }
             }
         }
-        private void CheckPreviousAndLoad(int firstVisibleItemIndex)
+        private void CheckPreviousAndLoad(int firstVisibleItemIndex, double delta)
         {
-            if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
+            if (firstVisibleItemIndex + 1 <= REMAIN_COUNT && delta < 20 && !deletingOnTail)
             {
                 RenderPrevious(10);
                 if (ContentCount > MAX_CONTENT)
@@ -93,24 +92,27 @@ namespace PureReader.ViewModels
                 }
             }
         }
-        bool DeletingOnHead;
+        bool deletingOnHead;
         void RemoveAtHead(int count)
         {
-            DeletingOnHead = true;
+            deletingOnHead = true;
             for (int i = 0; i < count; i++)
             {
                 Contents.RemoveAt(0);
             }
-            previousOffset += 10;
-            DeletingOnHead = false;
+            previousOffset += count;
+            deletingOnHead = false;
         }
-
+        bool deletingOnTail;
         void RemoveAtTail(int count)
         {
+            deletingOnTail = true;
             for (int i = 0; i < count; i++)
             {
                 Contents.RemoveAt(ContentCount - 1);
             }
+            forwardOffset -= count;
+            deletingOnTail = false;
         }
 
         private void FirstRender()
@@ -145,7 +147,7 @@ namespace PureReader.ViewModels
             {
                 Contents.Add(item);
             }
-            forwardOffset = needToRender.LastOrDefault()?.LineIndex ?? Current.BookSize - 1;
+            forwardOffset = needToRender.Last().LineIndex + 1;
         }
 
         private async void RenderPrevious(int insertCount)
