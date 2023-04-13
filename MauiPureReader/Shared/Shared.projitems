@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\CacheContentManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\FileResultExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\StreamReaderWithRealPosition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\TaskHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TxtHandler.cs" />
     <Compile Include="..\Shared\Data\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\BookService.cs" />
