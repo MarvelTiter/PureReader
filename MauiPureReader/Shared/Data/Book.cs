@@ -1,6 +1,7 @@
 ﻿using MDbEntity.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,6 +27,7 @@ namespace Shared.Data
         public long BookSize { get; set; }
 
         private int lineCursor = -1;
+
         public int LineCursor
         {
             get => lineCursor; set

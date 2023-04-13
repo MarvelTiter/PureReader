@@ -52,6 +52,11 @@ namespace Shared.Services
             return contents;
         }
 
+        public Task<IList<Content>> GetAllContents(Book book)
+        {
+            return context.Select<Content>().Where(b => b.BookId == book.Id).ToListAsync();
+        }
+
         public Task<int> SaveContents(IEnumerable<Content> contents)
         {
             return context.Insert<Content>().AppendData(contents).ExecuteAsync();

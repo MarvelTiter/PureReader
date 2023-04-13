@@ -145,7 +145,7 @@ namespace Shared.Utils
                             break;
                         }
                         var line = sr.ReadLine();
-                        
+
                         var match = line.ExtractChapter();
                         //if (match.Success)
                         //{

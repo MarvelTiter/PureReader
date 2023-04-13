@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\FileService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\INavigable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\CacheContentManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\FileResultExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\StreamReaderWithRealPosition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\TxtHandler.cs" />

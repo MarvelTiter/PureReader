@@ -30,8 +30,12 @@ namespace PureReader.ViewModels
         [ObservableProperty]
         private bool loading;
         private const int REMAIN_COUNT = 10;
-        private const int MAX_CONTENT = 100;
-
+        private const int MAX_CONTENT = 50;
+        private const int APPEND_COUNT = 10;
+        [ObservableProperty]
+        private string currentChapter;
+        [ObservableProperty]
+        private string progress;
         Rect ViewRect => Shell.Current.CurrentPage.Bounds;
         int ContentCount => Contents.Count;
         CancellationTokenSource source;
@@ -46,24 +50,32 @@ namespace PureReader.ViewModels
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
-            //Debug.WriteLine("=========================Scroll============================");
-            //Debug.WriteLine($"VerticalOffset: {e.VerticalOffset}, VerticalDelta: {e.VerticalDelta}");
+            if (deletingOnHead || deletingOnTail) return;
             if (e.FirstVisibleItemIndex != preIndex)
             {
-                //Debug.WriteLine($"FirstVisibleItemIndex: {e.FirstVisibleItemIndex}, LastVisibleItemIndex: {e.LastVisibleItemIndex}");
                 preIndex = e.FirstVisibleItemIndex;
+                Current.LineCursor = Contents[e.FirstVisibleItemIndex].LineIndex;
+                //Progress = Current.FormatProgress;
                 if (e.VerticalDelta > 0)
                 {
-                    Current.LineCursor++;
                     CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
                 }
                 else
                 {
-                    Current.LineCursor--;
                     CheckPreviousAndLoad(e.FirstVisibleItemIndex, e.VerticalDelta);
                 }
-                //Debug.WriteLine($"LineCursor: {Current.LineCursor}, ContentCount: {ContentCount}");
             }
+        }
+
+        [RelayCommand]
+        private void Tap()
+        {
+
+        }
+        [RelayCommand]
+        private void Swipe()
+        {
+
         }
         /// <summary>
         /// 检查剩余多少项，并按需加载
@@ -72,23 +84,23 @@ namespace PureReader.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void CheckRemainAndLoad(int lastVisibleItemIndex, double delta)
         {
-            if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT && delta < 20 && !deletingOnHead)
+            if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
             {
-                RenderForward(10);
+                RenderForward(APPEND_COUNT);
                 if (ContentCount > MAX_CONTENT)
                 {
-                    RemoveAtHead(10);
+                    RemoveAtHead(APPEND_COUNT);
                 }
             }
         }
         private void CheckPreviousAndLoad(int firstVisibleItemIndex, double delta)
         {
-            if (firstVisibleItemIndex + 1 <= REMAIN_COUNT && delta < 20 && !deletingOnTail)
+            if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
             {
-                RenderPrevious(10);
+                RenderPrevious(APPEND_COUNT);
                 if (ContentCount > MAX_CONTENT)
                 {
-                    RemoveAtTail(10);
+                    RemoveAtTail(APPEND_COUNT);
                 }
             }
         }
@@ -100,7 +112,7 @@ namespace PureReader.ViewModels
             {
                 Contents.RemoveAt(0);
             }
-            previousOffset += count;
+            cache.FixedIndex(true, count);
             deletingOnHead = false;
         }
         bool deletingOnTail;
@@ -111,84 +123,51 @@ namespace PureReader.ViewModels
             {
                 Contents.RemoveAt(ContentCount - 1);
             }
-            forwardOffset -= count;
+            cache.FixedIndex(false, count);
             deletingOnTail = false;
         }
 
-        private void FirstRender()
+        private void RenderForward(int appendCount)
         {
-            Loading = true;
-            Task.Run(async () =>
-            {
-                var start = forwardOffset;
-            reset:
-                //var needToRender = caches.Skip(start).Take(count);
-                var needToRender = await bookService.GetBookContents(Current.Id, start, 30);
-                if (needToRender.Count < 30)
-                {
-                    goto reset;
-                }
-                foreach (var item in needToRender)
-                {
-                    //Contents.Add(new Content(item));
-                    Contents.Add(item);
-                }
-                forwardOffset += 30;
-                Loading = false;
-            });
-        }
-        private async void RenderForward(int appendCount)
-        {
-            if (forwardOffset >= Current.BookSize - 1) return;
-            var start = forwardOffset;
-            var count = appendCount;
-            var needToRender = await bookService.GetBookContents(Current.Id, start, count);
+            var needToRender = cache.LoadForwardContent(appendCount);
             foreach (var item in needToRender)
             {
                 Contents.Add(item);
             }
-            forwardOffset = needToRender.Last().LineIndex + 1;
         }
 
-        private async void RenderPrevious(int insertCount)
+        private void RenderPrevious(int insertCount)
         {
-            if (previousOffset <= 0) return;
-            var start = previousOffset - insertCount;
-            var count = start < 0 ? insertCount + start : insertCount;
-            start = start < 0 ? 0 : start;
-            var needToRender = await bookService.GetBookContents(Current.Id, start, count);
-            foreach (var item in needToRender.Reverse())
+            var needToRender = cache.LoadPreviousContent(insertCount);
+            foreach (var item in needToRender)
             {
                 Contents.Insert(0, item);
             }
-            previousOffset = needToRender.FirstOrDefault()?.LineIndex ?? 0;
         }
 
-        int forwardOffset;
-        int previousOffset;
-        Task solveTask;
-        public override Task OnNavigatedTo()
+        CacheContentManager cache;
+        public override async Task OnNavigatedTo()
         {
             Contents.Clear();
-            forwardOffset = Current.LineCursor;
-            previousOffset = Current.LineCursor;
-            source = new CancellationTokenSource();
             if (!Current.Done)
             {
                 // 继续解析
-                solveTask = fileHandler.Solve(Current, source.Token);
+                source = new CancellationTokenSource();
+                _ = fileHandler.Solve(Current, source.Token);
             }
-            FirstRender();
-            return Task.CompletedTask;
+            cache = new CacheContentManager(Current, bookService);
+            var contents = await cache.Init();
+            foreach (var item in contents)
+            {
+                Contents.Add(item);
+            }
         }
-
 
         public override async Task OnNavigatedFrom()
         {
             Contents.Clear();
             source?.Cancel();
             source?.Dispose();
-            if (solveTask != null) await solveTask;
             //await bookService.UpdateBookInfo(Current);
             await bookService.UpdateBookProgress(Current);
             SimpleEventHub.Send<BookshelfViewModel, bool>("OnNavigatedBackFromReadView", true);
@@ -207,7 +186,7 @@ namespace PureReader.ViewModels
             if (!Current.Done)
             {
                 // 继续解析
-                solveTask = fileHandler.Solve(Current, source.Token);
+                _ = fileHandler.Solve(Current, source.Token);
             }
             return Task.CompletedTask;
         }
