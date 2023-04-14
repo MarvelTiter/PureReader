@@ -30,13 +30,14 @@ namespace PureReader.ViewModels
         [ObservableProperty]
         private bool loading;
         private const int REMAIN_COUNT = 10;
-        private const int MAX_CONTENT = 50;
+        private const int MAX_CONTENT = 100;
+        private const int MIN_CONTENT = 50;
         private const int APPEND_COUNT = 10;
         [ObservableProperty]
         private string currentChapter;
         [ObservableProperty]
         private string progress;
-        Rect ViewRect => Shell.Current.CurrentPage.Bounds;
+        //Rect ViewRect => Shell.Current.CurrentPage.Bounds;
         int ContentCount => Contents.Count;
         CancellationTokenSource source;
         public ReadViewModel(IFileHandler fileHandler, BookService bookService)
@@ -50,12 +51,14 @@ namespace PureReader.ViewModels
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
-            if (deletingOnHead || deletingOnTail) return;
+            //if (deletingOnHead || deletingOnTail) return;
+            if (Math.Abs(e.VerticalDelta) > 100) return;
             if (e.FirstVisibleItemIndex != preIndex)
             {
                 preIndex = e.FirstVisibleItemIndex;
                 Current.LineCursor = Contents[e.FirstVisibleItemIndex].LineIndex;
                 //Progress = Current.FormatProgress;
+                cache.UpdateCachePool();
                 if (e.VerticalDelta > 0)
                 {
                     CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
@@ -89,7 +92,7 @@ namespace PureReader.ViewModels
                 RenderForward(APPEND_COUNT);
                 if (ContentCount > MAX_CONTENT)
                 {
-                    RemoveAtHead(APPEND_COUNT);
+                    RemoveAtHead();
                 }
             }
         }
@@ -100,30 +103,30 @@ namespace PureReader.ViewModels
                 RenderPrevious(APPEND_COUNT);
                 if (ContentCount > MAX_CONTENT)
                 {
-                    RemoveAtTail(APPEND_COUNT);
+                    RemoveAtTail();
                 }
             }
         }
         bool deletingOnHead;
-        void RemoveAtHead(int count)
+        void RemoveAtHead()
         {
             deletingOnHead = true;
-            for (int i = 0; i < count; i++)
+            while (ContentCount > MIN_CONTENT)
             {
                 Contents.RemoveAt(0);
             }
-            cache.FixedIndex(true, count);
+            cache.FixedIndex(true, Contents.FirstOrDefault()?.LineIndex ?? 0);
             deletingOnHead = false;
         }
         bool deletingOnTail;
-        void RemoveAtTail(int count)
+        void RemoveAtTail()
         {
             deletingOnTail = true;
-            for (int i = 0; i < count; i++)
+            while (ContentCount > MIN_CONTENT)
             {
                 Contents.RemoveAt(ContentCount - 1);
             }
-            cache.FixedIndex(false, count);
+            cache.FixedIndex(false, Contents.Last().LineIndex);
             deletingOnTail = false;
         }
 

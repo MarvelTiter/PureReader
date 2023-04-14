@@ -43,9 +43,17 @@ namespace Shared.Utils
             }
         }
 
+        public void UpdateCachePool()
+        {
+            TaskHelper.Run(nameof(UpdateCachePool), token =>
+            {
+                //forward.
+            });
+        }
+
         private void CheckCachePool()
         {
-            TaskHelper.Run(nameof(CheckCachePool), async () =>
+            TaskHelper.Run(nameof(CheckCachePool), async token =>
             {
                 if (forward.Count < 20 && forwardIndex < book.Lines)
                 {
@@ -73,10 +81,10 @@ namespace Shared.Utils
 
         private void UpdatePreviousCache()
         {
-            TaskHelper.Run(nameof(UpdatePreviousCache), async () =>
+            TaskHelper.Run(nameof(UpdatePreviousCache), async token =>
             {
-                var start = previousIndex - 20;
-                var count = start < 0 ? start + 20 : 20;
+                var start = previousIndex - CACHE_SIZE;
+                var count = start < 0 ? start + CACHE_SIZE : CACHE_SIZE;
                 var contents = await service.GetBookContents(book.Id, start, count);
                 previous.Clear();
                 foreach (var item in contents)
@@ -97,9 +105,9 @@ namespace Shared.Utils
 
         private void UpdateForwardCache()
         {
-            TaskHelper.Run(nameof(UpdateForwardCache), async () =>
+            TaskHelper.Run(nameof(UpdateForwardCache), async token =>
             {
-                var contents = await service.GetBookContents(book.Id, forwardIndex, 20);
+                var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
                 forward.Clear();
                 foreach (var item in contents)
                 {
@@ -128,23 +136,23 @@ namespace Shared.Utils
             CheckCachePool();
         }
 
-        internal void FixedIndex(bool head, int count)
+        internal void FixedIndex(bool head, int index)
         {
             if (head)
             {
                 /*
                  * 往下翻，更新前面缓存
                  */
-                previousIndex += count;
-                UpdatePreviousCache();
+                previousIndex = index;
+                //UpdatePreviousCache();
             }
             else
             {
                 /*
                  * 往上翻，更新后面的缓存
                  */
-                forwardIndex -= count;
-                UpdateForwardCache();
+                forwardIndex = index;
+                //UpdateForwardCache();
             }
         }
     }
