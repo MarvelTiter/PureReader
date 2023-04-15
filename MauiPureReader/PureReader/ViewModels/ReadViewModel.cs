@@ -29,7 +29,7 @@ namespace PureReader.ViewModels
         private ObservableCollection<Content> contents;
         [ObservableProperty]
         private bool loading;
-        private const int REMAIN_COUNT = 10;
+        private const int REMAIN_COUNT = 20;
         private const int MAX_CONTENT = 100;
         private const int MIN_CONTENT = 50;
         private const int APPEND_COUNT = 10;
@@ -51,14 +51,12 @@ namespace PureReader.ViewModels
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
-            //if (deletingOnHead || deletingOnTail) return;
-            if (Math.Abs(e.VerticalDelta) > 100) return;
+            if (Math.Abs(e.VerticalDelta) > 50 || Loading) return;
             if (e.FirstVisibleItemIndex != preIndex)
             {
                 preIndex = e.FirstVisibleItemIndex;
                 Current.LineCursor = Contents[e.FirstVisibleItemIndex].LineIndex;
                 //Progress = Current.FormatProgress;
-                cache.UpdateCachePool();
                 if (e.VerticalDelta > 0)
                 {
                     CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
@@ -70,16 +68,6 @@ namespace PureReader.ViewModels
             }
         }
 
-        [RelayCommand]
-        private void Tap()
-        {
-
-        }
-        [RelayCommand]
-        private void Swipe()
-        {
-
-        }
         /// <summary>
         /// 检查剩余多少项，并按需加载
         /// </summary>
@@ -87,67 +75,53 @@ namespace PureReader.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void CheckRemainAndLoad(int lastVisibleItemIndex, double delta)
         {
-            if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
+            Loading = true;
+            TaskHelper.Run(nameof(CheckRemainAndLoad), token =>
             {
-                RenderForward(APPEND_COUNT);
-                if (ContentCount > MAX_CONTENT)
+                if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
                 {
-                    RemoveAtHead();
+                    var needToRender = cache.LoadForwardContent(APPEND_COUNT);
+                    foreach (var item in needToRender)
+                    {
+                        Contents.Add(item);
+                    }
+                    if (ContentCount > MAX_CONTENT)
+                    {
+                        while (ContentCount > MIN_CONTENT)
+                        {
+                            Contents.RemoveAt(0);
+                        }
+                        cache.FixedIndex(true, Contents.FirstOrDefault()?.LineIndex ?? 0);
+                    }
                 }
-            }
+                Loading = false;
+            });
         }
         private void CheckPreviousAndLoad(int firstVisibleItemIndex, double delta)
         {
-            if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
+            Loading = true;
+            TaskHelper.Run(nameof(CheckPreviousAndLoad), token =>
             {
-                RenderPrevious(APPEND_COUNT);
-                if (ContentCount > MAX_CONTENT)
+                if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
                 {
-                    RemoveAtTail();
+                    var needToRender = cache.LoadPreviousContent(APPEND_COUNT);
+                    foreach (var item in needToRender)
+                    {
+                        Contents.Insert(0, item);
+                    }
+                    if (ContentCount > MAX_CONTENT)
+                    {
+                        while (ContentCount > MIN_CONTENT)
+                        {
+                            Contents.RemoveAt(ContentCount - 1);
+                        }
+                        cache.FixedIndex(false, Contents.Last().LineIndex + 1);
+                    }
                 }
-            }
+                Loading = false;
+            });
         }
-        bool deletingOnHead;
-        void RemoveAtHead()
-        {
-            deletingOnHead = true;
-            while (ContentCount > MIN_CONTENT)
-            {
-                Contents.RemoveAt(0);
-            }
-            cache.FixedIndex(true, Contents.FirstOrDefault()?.LineIndex ?? 0);
-            deletingOnHead = false;
-        }
-        bool deletingOnTail;
-        void RemoveAtTail()
-        {
-            deletingOnTail = true;
-            while (ContentCount > MIN_CONTENT)
-            {
-                Contents.RemoveAt(ContentCount - 1);
-            }
-            cache.FixedIndex(false, Contents.Last().LineIndex);
-            deletingOnTail = false;
-        }
-
-        private void RenderForward(int appendCount)
-        {
-            var needToRender = cache.LoadForwardContent(appendCount);
-            foreach (var item in needToRender)
-            {
-                Contents.Add(item);
-            }
-        }
-
-        private void RenderPrevious(int insertCount)
-        {
-            var needToRender = cache.LoadPreviousContent(insertCount);
-            foreach (var item in needToRender)
-            {
-                Contents.Insert(0, item);
-            }
-        }
-
+        
         CacheContentManager cache;
         public override async Task OnNavigatedTo()
         {

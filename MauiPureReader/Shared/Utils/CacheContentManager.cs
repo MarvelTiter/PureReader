@@ -17,6 +17,7 @@ namespace Shared.Utils
         const int FIRST_LOAD = 50;
         const int CACHE_SIZE = 50;
         const int ONCE_PICK_COUNT = 10;
+        const int CACHE_LIMIT = 20;
         public CacheContentManager(Book book, BookService service)
         {
             this.book = book;
@@ -38,47 +39,67 @@ namespace Shared.Utils
             else
             {
                 forwardIndex += FIRST_LOAD;
-                CheckCachePool();
+                CheckPreviousCache();
+                CheckForwardCache();
                 return contents;
             }
         }
 
-        public void UpdateCachePool()
+        private void CheckForwardCache()
         {
-            TaskHelper.Run(nameof(UpdateCachePool), token =>
+            TaskHelper.Run(nameof(CheckForwardCache), async token =>
             {
-                //forward.
-            });
-        }
-
-        private void CheckCachePool()
-        {
-            TaskHelper.Run(nameof(CheckCachePool), async token =>
-            {
-                if (forward.Count < 20 && forwardIndex < book.Lines)
+                if (forward.Count < CACHE_LIMIT && forwardIndex < book.Lines)
                 {
-                    var contents = await service.GetBookContents(book.Id, forwardIndex, 50);
+                    var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
                     forwardIndex = contents.Last().LineIndex + 1;
                     foreach (var item in contents)
                     {
                         forward.Enqueue(item);
                     }
                 }
-
-                if (previous.Count < 20 && previousIndex > 0)
+            });
+        }
+        private void UpdateForwardCache()
+        {
+            TaskHelper.Run(nameof(UpdateForwardCache), async token =>
+            {
+                var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
+                forwardIndex = contents.Last().LineIndex + 1;
+                forward.Clear();
+                foreach (var item in contents)
                 {
-                    var start = previousIndex - 50;
-                    var count = start < 0 ? start + 50 : 50;
-                    var contents = await service.GetBookContents(book.Id, start, count);
-                    previousIndex = contents.FirstOrDefault()?.LineIndex ?? 0;
-                    IList<Content> old = previous.ToList();
-                    old.Reverse();
-                    var newList = contents.Concat(old);
-                    previous = new Stack<Content>(newList);
+                    forward.Enqueue(item);
                 }
             });
         }
+        public IEnumerable<Content> LoadForwardContent(int count)
+        {
+            while (forward.Count > 0 && count > 0)
+            {
+                yield return forward.Dequeue();
+                count--;
+            }
+            CheckForwardCache();
+        }
 
+        private void CheckPreviousCache()
+        {
+            TaskHelper.Run(nameof(CheckPreviousCache), async token =>
+            {
+                if (previous.Count < CACHE_SIZE && previousIndex > 0)
+                {
+                    var old = previous.Reverse().ToList();
+                    var start = previousIndex - CACHE_SIZE;
+                    var count = start < 0 ? start + CACHE_SIZE : CACHE_SIZE;
+                    var contents = await service.GetBookContents(book.Id, start, count);
+                    previousIndex = contents.FirstOrDefault()?.LineIndex ?? 0;
+                    previous.Clear();
+                    foreach (var item in contents) previous.Push(item);
+                    foreach (var item in old) previous.Push(item);
+                }
+            });
+        }
         private void UpdatePreviousCache()
         {
             TaskHelper.Run(nameof(UpdatePreviousCache), async token =>
@@ -87,45 +108,9 @@ namespace Shared.Utils
                 var count = start < 0 ? start + CACHE_SIZE : CACHE_SIZE;
                 var contents = await service.GetBookContents(book.Id, start, count);
                 previous.Clear();
-                foreach (var item in contents)
-                {
-                    previous.Push(item);
-                }
+                foreach (var item in contents) previous.Push(item);
             });
         }
-
-
-        /// <summary>
-        /// 检查缓存是否足够
-        /// </summary>
-        private void CheckForwardCache()
-        {
-
-        }
-
-        private void UpdateForwardCache()
-        {
-            TaskHelper.Run(nameof(UpdateForwardCache), async token =>
-            {
-                var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
-                forward.Clear();
-                foreach (var item in contents)
-                {
-                    forward.Enqueue(item);
-                }
-            });
-        }
-
-        public IEnumerable<Content> LoadForwardContent(int count)
-        {
-            while (forward.Count > 0 && count > 0)
-            {
-                yield return forward.Dequeue();
-                count--;
-            }
-            CheckCachePool();
-        }
-
         public IEnumerable<Content> LoadPreviousContent(int count)
         {
             while (previous.Count > 0 && count > 0)
@@ -133,7 +118,7 @@ namespace Shared.Utils
                 yield return previous.Pop();
                 count--;
             }
-            CheckCachePool();
+            CheckPreviousCache();
         }
 
         internal void FixedIndex(bool head, int index)
@@ -144,7 +129,7 @@ namespace Shared.Utils
                  * 往下翻，更新前面缓存
                  */
                 previousIndex = index;
-                //UpdatePreviousCache();
+                UpdatePreviousCache();
             }
             else
             {
@@ -152,7 +137,7 @@ namespace Shared.Utils
                  * 往上翻，更新后面的缓存
                  */
                 forwardIndex = index;
-                //UpdateForwardCache();
+                UpdateForwardCache();
             }
         }
     }

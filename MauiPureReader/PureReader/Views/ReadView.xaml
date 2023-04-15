@@ -24,7 +24,7 @@
                    FontAutoScalingEnabled="False"
                    FontSize="18"
                    LineHeight="1"
-                   Text="{Binding LineIndex}"
+                   Text="{Binding Text}"
                    VerticalTextAlignment="Center" />
         </DataTemplate>
         <DataTemplate x:Key="TitleContent" x:DataType="model:Content">
@@ -38,10 +38,10 @@
                           TitleTemplate="{StaticResource TitleContent}" />
     </ContentPage.Resources>
     <Grid RowDefinitions="*,Auto">
-        <ActivityIndicator Grid.RowSpan="2"
+        <!--<ActivityIndicator Grid.RowSpan="2"
                            IsRunning="{Binding Loading}"
                            WidthRequest="100"
-                           Color="{StaticResource Primary}" />
+                           Color="{StaticResource Primary}" />-->
         <CollectionView x:Name="Scroller"
                         Grid.RowSpan="2"
                         Margin="10,10,10,0"
