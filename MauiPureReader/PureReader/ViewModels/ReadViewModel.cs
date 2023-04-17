@@ -51,7 +51,7 @@ namespace PureReader.ViewModels
         [RelayCommand]
         private void HandleScroll(ItemsViewScrolledEventArgs e)
         {
-            if (Math.Abs(e.VerticalDelta) > 50 || Loading) return;
+            if (Math.Abs(e.VerticalDelta) > 50 || Loading || e.FirstVisibleItemIndex >= ContentCount) return;
             if (e.FirstVisibleItemIndex != preIndex)
             {
                 preIndex = e.FirstVisibleItemIndex;
@@ -85,7 +85,7 @@ namespace PureReader.ViewModels
                     {
                         Contents.Add(item);
                     }
-                    if (ContentCount > MAX_CONTENT)
+                    if (ContentCount > MAX_CONTENT && false)
                     {
                         while (ContentCount > MIN_CONTENT)
                         {
@@ -109,7 +109,7 @@ namespace PureReader.ViewModels
                     {
                         Contents.Insert(0, item);
                     }
-                    if (ContentCount > MAX_CONTENT)
+                    if (ContentCount > MAX_CONTENT && false)
                     {
                         while (ContentCount > MIN_CONTENT)
                         {

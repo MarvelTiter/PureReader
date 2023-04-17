@@ -7,8 +7,8 @@ namespace Shared.Data
         public int Id { get; set; }
         public string BookId { get; set; }
         public string Title { get; set; }
-        public int StartIndex { get; set; }
-        public int EndIndex { get; set; }
+        public long Start { get; set; }
+        public long End { get; set; }
     }
     public class Content
     {

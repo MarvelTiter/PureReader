@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Services
 {
-    public class BookService
+    public partial class BookService
     {
         private readonly IExpressionContext context;
 
