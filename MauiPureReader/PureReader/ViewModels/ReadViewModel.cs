@@ -39,6 +39,7 @@ namespace PureReader.ViewModels
         private string progress;
         //Rect ViewRect => Shell.Current.CurrentPage.Bounds;
         int ContentCount => Contents.Count;
+        public BookService Service => bookService;
         CancellationTokenSource source;
         public ReadViewModel(IFileHandler fileHandler, BookService bookService)
         {

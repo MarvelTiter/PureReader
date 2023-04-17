@@ -10,7 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Data\Book.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\Chapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\Content.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Data\ReadSetting.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\StringEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\ChapterService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\FileService.cs" />

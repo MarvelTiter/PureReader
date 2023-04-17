@@ -2,6 +2,7 @@
 <ContentPage x:Class="PureReader.Views.ReadView"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PureReader.Controls"
              xmlns:model="clr-namespace:Shared.Data"
              xmlns:sel="clr-namespace:PureReader.TemplateSelectors"
              xmlns:service="clr-namespace:Shared.Services"
@@ -42,7 +43,7 @@
                            IsRunning="{Binding Loading}"
                            WidthRequest="100"
                            Color="{StaticResource Primary}" />-->
-        <CollectionView x:Name="Scroller"
+        <!--<CollectionView x:Name="Scroller"
                         Grid.RowSpan="2"
                         Margin="10,10,10,0"
                         ItemTemplate="{StaticResource LineContent}"
@@ -53,7 +54,7 @@
                                                 Command="{Binding HandleScrollCommand}"
                                                 EventName="Scrolled" />
             </CollectionView.Behaviors>
-        </CollectionView>
+        </CollectionView>-->
         <!--<Grid Grid.Row="1"
               Padding="10,0"
               BackgroundColor="#55ffffff"
@@ -63,5 +64,6 @@
                    FontSize="12"
                    Text="{Binding Progress}" />
         </Grid>-->
+        <local:TxtReaderView CurrentBook="{Binding Current}" Service="{Binding Service}" />
     </Grid>
 </ContentPage>

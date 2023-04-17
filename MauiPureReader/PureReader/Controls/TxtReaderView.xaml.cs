@@ -1,9 +1,10 @@
+using PureReader.Drawables;
 using Shared.Data;
 using Shared.Services;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace PureReader.Controls;
-
 public partial class TxtReaderView : ContentView
 {
     public Book CurrentBook
@@ -30,10 +31,15 @@ public partial class TxtReaderView : ContentView
         reader.Init();
     }
 
-    private void Init()
+    public ObservableCollection<IDrawable> Pages { get; set; } = new ObservableCollection<IDrawable>();
+
+    private async void Init()
     {
         if (CurrentBook == null || Service == null) return;
-
+        var contents = await Service.GetBookContents(CurrentBook.Id, 0, 100);
+        Pages.Clear();
+        Pages.Add(new TxtDrawable(contents, new ReadSetting()));
+        OnPropertyChanged(nameof(Pages));
     }
 
     public TxtReaderView()

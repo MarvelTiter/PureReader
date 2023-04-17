@@ -44,12 +44,20 @@ namespace Shared.Services
 
         public async Task<IList<Content>> GetBookContents(string bookId, int start, int count)
         {
-            var end = start + count;
-            var contents = await context.Select<Content>()
-                .Where(c => c.BookId == bookId && c.LineIndex >= start && c.LineIndex < end)
-                .OrderBy(c => c.LineIndex, true)
-                .ToListAsync();
-            return contents;
+            try
+            {
+                var end = start + count;
+                var contents = await context.Select<Content>()
+                    .Where(c => c.BookId == bookId && c.LineIndex >= start && c.LineIndex < end)
+                    .OrderBy(c => c.LineIndex, true)
+                    .ToListAsync();
+                return contents;
+            }
+            catch (Exception)
+            {
+                return await GetBookContents(bookId, start, count);
+            }
+            
         }
 
         public Task<IList<Content>> GetAllContents(Book book)
