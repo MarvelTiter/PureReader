@@ -3,6 +3,7 @@ using Shared.Data;
 using Shared.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace PureReader.Controls;
 public partial class TxtReaderView : ContentView
@@ -31,15 +32,16 @@ public partial class TxtReaderView : ContentView
         reader.Init();
     }
 
-    public ObservableCollection<IDrawable> Pages { get; set; } = new ObservableCollection<IDrawable>();
+    public ObservableCollection<TxtDrawable> Pages { get; set; } = new ObservableCollection<TxtDrawable>();
+
+    public TxtDrawable Drawer { get; set; } = new TxtDrawable(new ReadSetting());
 
     private async void Init()
     {
         if (CurrentBook == null || Service == null) return;
+        System.Diagnostics.Debug.WriteLine("Init......................");
         var contents = await Service.GetBookContents(CurrentBook.Id, 0, 100);
-        Pages.Clear();
-        Pages.Add(new TxtDrawable(contents, new ReadSetting()));
-        OnPropertyChanged(nameof(Pages));
+        Drawer.UpdateContents(contents);
     }
 
     public TxtReaderView()
@@ -55,5 +57,30 @@ public partial class TxtReaderView : ContentView
         {
             preIndex = e.FirstVisibleItemIndex;
         }
+    }
+
+    private void GraphicsView_Loaded(object sender, EventArgs e)
+    {
+        System.Diagnostics.Debug.WriteLine("GraphicsView_Loaded......................");
+        var g = sender as GraphicsView;
+        g.Invalidate();
+    }
+    bool enableDrag = false;
+    private void Graphics_StartInteraction(object sender, TouchEventArgs e)
+    {
+        enableDrag = true;
+        Debug.WriteLine($"Tap Start: {e.Touches[0]}");
+    }
+
+    private void Graphics_DragInteraction(object sender, TouchEventArgs e)
+    {
+        if (!enableDrag) return;
+        Debug.WriteLine($"Drag: {e.Touches[0]}");
+    }
+
+    private void Graphics_EndInteraction(object sender, TouchEventArgs e)
+    {
+        enableDrag = false;
+        Debug.WriteLine($"Tap End: {e.Touches[0]}");
     }
 }

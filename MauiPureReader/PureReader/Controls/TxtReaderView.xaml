@@ -5,15 +5,29 @@
              xmlns:local="clr-namespace:PureReader.Controls"
              x:Name="this">
 
-    <CollectionView x:Name="wrapper"
+    <!--<CollectionView x:Name="wrapper"
                     BindingContext="{x:Reference this}"
                     ItemsSource="{Binding Pages}"
-                    Scrolled="Wrapper_Scrolled">
+                    Scrolled="Wrapper_Scrolled"
+                    VerticalScrollBarVisibility="Never">
         <CollectionView.ItemTemplate>
             <DataTemplate>
-                <GraphicsView Drawable="{Binding .}" />
-                <!--<Label Text="Hello" />-->
+                <Grid>
+                    <GraphicsView Drawable="{Binding .}" HeightRequest="1000" />
+                </Grid>
+    -->
+    <!--<Label Text="Hello" />-->
+    <!--
             </DataTemplate>
         </CollectionView.ItemTemplate>
-    </CollectionView>
+    </CollectionView>-->
+    <Grid BindingContext="{x:Reference this}">
+        <GraphicsView x:Name="Graphics"
+                      DragInteraction="Graphics_DragInteraction"
+                      Drawable="{Binding Drawer}"
+                      EndInteraction="Graphics_EndInteraction"
+                      HorizontalOptions="Fill"
+                      StartInteraction="Graphics_StartInteraction"
+                      VerticalOptions="Fill" />
+    </Grid>
 </ContentView>

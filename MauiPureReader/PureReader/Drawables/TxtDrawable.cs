@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Graphics;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Graphics;
 using Shared.Data;
 using System;
 using System.Collections.Generic;
@@ -9,20 +10,37 @@ using System.Threading.Tasks;
 
 namespace PureReader.Drawables
 {
-    internal class TxtDrawable : IDrawable
+    internal class TestDrawable : IDrawable
     {
-        private readonly IList<Content> lines;
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            float topOffset = 0f;
+            for (int i = 0; i < 10; i++)
+            {
+                canvas.DrawString($"Hello {i}", 0, topOffset, HorizontalAlignment.Left);
+                topOffset += 20f;
+            }
+        }
+    }
+
+    public class TxtDrawable : IDrawable
+    {
+        private IEnumerable<Content> lines;
         private readonly ReadSetting setting;
         float topOffset = 0f;
-        public int Height => (int)topOffset;
-        public TxtDrawable(IList<Content> lines, ReadSetting setting)
+
+        public void UpdateContents(IEnumerable<Content> lines) => this.lines = lines;
+
+        public TxtDrawable(IEnumerable<Content> lines, ReadSetting setting)
         {
             this.lines = lines;
             this.setting = setting;
         }
+        public TxtDrawable(ReadSetting setting) : this(Enumerable.Empty<Content>(), setting)
+        {
+        }
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
-            //canvas.SetFillPaint()
             canvas.FontSize = setting.FontSize;
             foreach (var line in lines)
             {

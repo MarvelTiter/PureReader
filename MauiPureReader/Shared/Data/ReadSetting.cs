@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Shared.Data
 {
-    internal class ReadSetting
+    public class ReadSetting
     {
         public float FontSize { get; set; } = 16f;
         public float LineSpacing { get; set; } = 16f;
