@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Maui.Graphics;
 using Shared.Data;
+using Shared.Services;
 using Shared.Utils;
 using System;
 using System.Collections.Generic;
@@ -11,35 +12,30 @@ using System.Threading.Tasks;
 
 namespace PureReader.Drawables
 {
-    internal class TestDrawable : IDrawable
-    {
-        public void Draw(ICanvas canvas, RectF dirtyRect)
-        {
-            float topOffset = 0f;
-            for (int i = 0; i < 10; i++)
-            {
-                canvas.DrawString($"Hello {i}", 0, topOffset, HorizontalAlignment.Left);
-                topOffset += 20f;
-            }
-        }
-    }
-
     public class TxtDrawable : IDrawable
     {
+        class PreviousInfo
+        {
+            public int Cursor { get; set; }
+            public float TopOffset { get; set; }
+            public float ParagraphHeight { get; set; }
+        }
         private readonly ReadSetting setting;
-        float topOffset = 0f;
+        private CacheContentManager cache;
+
+        PreviousInfo previousInfo;
         public float DragOffset { get; set; }
-        public CacheContentManager CacheMsg { get; set; }
+        public Book Current { get; set; }
         public TxtDrawable(ReadSetting setting)
         {
             this.setting = setting;
         }
-
-        Dictionary<int, float> position = new Dictionary<int, float>();
-        int lineCursor = 0;
+        public int Cursor => previousInfo.Cursor;
         public void FixContents()
         {
-
+            previousInfo.TopOffset = temp.TopOffset;
+            previousInfo.ParagraphHeight = temp.ParagraphHeight;
+            previousInfo.Cursor = temp.Cursor;
         }
 
         /// <summary>
@@ -49,43 +45,78 @@ namespace PureReader.Drawables
         /// <returns></returns>
         public bool CanDraw(float delta)
         {
-            return true;
+            if (delta > 0 && previousInfo.Cursor > 0)
+                return true;
+            else if (delta < 0 && previousInfo.Cursor < Current.Lines)
+                return true;
+            return false;
         }
 
-        public (float FirstOffset, int Cursor) PreviousInfo { get; set; } = (0, 0);
+        PreviousInfo temp = new PreviousInfo();
+
+        private float GetParagraphHeight(ICanvas canvas, string text, float canvasWidth)
+        {
+            var size = canvas.GetStringSize(text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
+            var rows = (int)((Math.Floor(size.Width) / (canvasWidth)) + 1);
+            return setting.LineSpacing * rows;
+        }
+
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
-            if (CacheMsg == null) return;
+            if (cache == null) return;
             canvas.FontSize = setting.FontSize;
-            topOffset += DragOffset;
-            var index = PreviousInfo.Cursor;
-            if (topOffset > 0)
+            var topOffset = previousInfo.TopOffset + DragOffset;
+            var index = previousInfo.Cursor;
+            while (topOffset > 0)
             {
-
+                index -= 1;
+                var line = cache.GetSingle(index);
+                if (line == null)
+                {
+                    topOffset = 0;
+                    break;
+                }
+                var ph = GetParagraphHeight(canvas, line.Text, dirtyRect.Width);
+                topOffset -= ph;
             }
-            var contents = CacheMsg.GetContents(index);
-
+            var firstLine = true;
+            var contents = cache.GetContents(index);
             foreach (var line in contents)
             {
-                var sSize = canvas.GetStringSize(line.Text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
-                var rows = (int)((Math.Floor(sSize.Width) / (dirtyRect.Width)) + 1);
-                var height = (setting.LineSpacing) * rows;
+                var height = GetParagraphHeight(canvas, line.Text, dirtyRect.Width);
                 if (topOffset + height < 0)
                 {
                     topOffset += height + setting.LineSpacing;
                     continue;
                 }
-                //Debug.WriteLine($"TopOffset: {topOffset}, Index: {line.LineIndex}");
+                if (firstLine)
+                {
+                    temp.TopOffset = topOffset;
+                    temp.Cursor = line.LineIndex;
+                    temp.ParagraphHeight = height + setting.LineSpacing;
+                    firstLine = false;
+                }
                 canvas.DrawString(line.Text, 0, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, 100);
                 topOffset += height + setting.LineSpacing;
                 if (topOffset > dirtyRect.Height)
                 {
-
                     break;
                 }
             }
+            cache.CheckCacheCapacity(temp.Cursor);
+        }
 
-            //Debug.WriteLine($"End Draw======================================");
+        internal async void Init(Book currentBook, BookService service)
+        {
+            Current = currentBook;
+            cache = new CacheContentManager(currentBook, service);
+            await cache.LoadContentsAsync(currentBook.LineCursor, CancellationToken.None);
+            previousInfo = new PreviousInfo
+            {
+                TopOffset = 0,
+                ParagraphHeight = 0,
+                Cursor = currentBook.LineCursor
+            };
         }
     }
 }

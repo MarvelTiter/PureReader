@@ -64,6 +64,8 @@
                    FontSize="12"
                    Text="{Binding Progress}" />
         </Grid>-->
-        <local:TxtReaderView CurrentBook="{Binding Current}" Service="{Binding Service}" />
+        <local:TxtReaderView Command="{Binding SaveProgressCommand}"
+                             CurrentBook="{Binding Current}"
+                             Service="{Binding Service}" />
     </Grid>
 </ContentPage>

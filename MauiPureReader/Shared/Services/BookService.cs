@@ -33,7 +33,7 @@ namespace Shared.Services
             return context.Update<Book>()
                 .Set(b => b.BookSize, book.BookSize)
                 .Set(b => b.Offset, book.Offset)
-                .Set(b=>b.Lines, book.Lines)
+                .Set(b => b.Lines, book.Lines)
                 .Where(b => b.Id == book.Id).ExecuteAsync();
         }
 
@@ -42,12 +42,14 @@ namespace Shared.Services
             return context.Update<Book>().Set(b => b.LineCursor, book.LineCursor).Where(b => b.Id == book.Id).ExecuteAsync();
         }
 
-        public async Task<IList<Content>> GetBookContents(string bookId, int start, int count)
+        public async Task<IList<Content>> GetBookContents(string bookId, int start, int count, CancellationToken token)
         {
             try
             {
+                if (start < 0) start = 0;
                 var end = start + count;
                 var contents = await context.Select<Content>()
+                    .AttachCancellationToken(token)
                     .Where(c => c.BookId == bookId && c.LineIndex >= start && c.LineIndex < end)
                     .OrderBy(c => c.LineIndex, true)
                     .ToListAsync();
@@ -55,9 +57,9 @@ namespace Shared.Services
             }
             catch (Exception)
             {
-                return await GetBookContents(bookId, start, count);
+                return await GetBookContents(bookId, start, count, token);
             }
-            
+
         }
 
         public Task<IList<Content>> GetAllContents(Book book)

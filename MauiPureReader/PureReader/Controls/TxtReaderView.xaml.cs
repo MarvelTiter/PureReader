@@ -4,6 +4,7 @@ using Shared.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Input;
 
 namespace PureReader.Controls;
 public partial class TxtReaderView : ContentView
@@ -24,6 +25,14 @@ public partial class TxtReaderView : ContentView
     public static readonly BindableProperty ServiceProperty =
           BindableProperty.Create(nameof(Service), typeof(BookService), typeof(TxtReaderView));
 
+    public ICommand Command
+    {
+        get { return (ICommand)GetValue(CommandProperty); }
+        set { SetValue(CommandProperty, value); }
+    }
+    public static readonly BindableProperty CommandProperty =
+        BindableProperty.Create(nameof(Command), typeof(ICommand), typeof(TxtReaderView));
+
 
     private static void OnBookChanged(BindableObject bindable, object oldValue, object newValue)
     {
@@ -39,8 +48,7 @@ public partial class TxtReaderView : ContentView
     private void Init()
     {
         if (CurrentBook == null || Service == null) return;
-        Drawer.CacheMsg = new Shared.Utils.CacheContentManager(CurrentBook, Service);
-        Drawer.PreviousInfo = (0, CurrentBook.LineCursor);
+        Drawer.Init(CurrentBook, Service);
     }
 
     public TxtReaderView()
@@ -70,5 +78,6 @@ public partial class TxtReaderView : ContentView
     {
         enableDrag = false;
         Drawer.FixContents();
+        Command?.Execute(Drawer.Cursor);
     }
 }
