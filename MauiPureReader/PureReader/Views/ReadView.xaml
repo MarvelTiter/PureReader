@@ -16,10 +16,8 @@
         <!--<BackButtonBehavior Command="{Binding TapCommand}" IconOverride="back" />-->
         <BackButtonBehavior Command="{x:Static service:NavigationService.GoBackCommand}" IconOverride="back" />
     </Shell.BackButtonBehavior>
-    <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="Transparent" StatusBarStyle="LightContent" />
-    </ContentPage.Behaviors>
-    <ContentPage.Resources>
+
+    <!--<ContentPage.Resources>
         <DataTemplate x:Key="LineContent" x:DataType="model:Content">
             <Label CharacterSpacing="2"
                    FontAutoScalingEnabled="False"
@@ -37,7 +35,7 @@
         <sel:LineSelector x:Key="LineSelector"
                           LineContentTemplate="{StaticResource LineContent}"
                           TitleTemplate="{StaticResource TitleContent}" />
-    </ContentPage.Resources>
+    </ContentPage.Resources>-->
     <Grid RowDefinitions="*,Auto">
         <!--<ActivityIndicator Grid.RowSpan="2"
                            IsRunning="{Binding Loading}"
@@ -55,7 +53,8 @@
                                                 EventName="Scrolled" />
             </CollectionView.Behaviors>
         </CollectionView>-->
-        <local:TxtReaderView Command="{Binding SaveProgressCommand}"
+        <local:TxtReaderView Grid.RowSpan="2"
+                             Command="{Binding SaveProgressCommand}"
                              CurrentBook="{Binding Current}"
                              Service="{Binding Service}" />
         <Grid Grid.Row="1"

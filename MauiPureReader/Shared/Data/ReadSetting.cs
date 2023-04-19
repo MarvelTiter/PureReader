@@ -7,8 +7,8 @@ namespace Shared.Data
 {
     public class ReadSetting
     {
-        public float FontSize { get; set; } = 16f;
-        public float LineSpacing { get; set; } = 16f;
+        public float FontSize { get; set; } = 18f;
+        public float LineSpacing { get; set; } = 18f;
         public string FontString { get; set; }
 
         public int Margin { get; set; } = 10;

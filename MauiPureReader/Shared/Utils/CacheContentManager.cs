@@ -19,6 +19,7 @@ namespace Shared.Utils
         {
             this.book = book;
             this.service = service;
+            preCursor = book.LineCursor;
         }
 
         public async Task<bool> LoadContentsAsync(int cursor, CancellationToken token)
@@ -56,7 +57,7 @@ namespace Shared.Utils
         int preCursor = -1;
         public void CheckCacheCapacity(int cursor)
         {
-            if (cursor != preCursor)
+            if (cursor != preCursor && Math.Abs(cursor - preCursor) > 5)
             {
                 preCursor = cursor;
                 if (cursor - startIndex < REMAIN_SIZE || endIndex - cursor < REMAIN_SIZE + 20)

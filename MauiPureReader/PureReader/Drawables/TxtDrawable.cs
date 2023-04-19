@@ -18,7 +18,6 @@ namespace PureReader.Drawables
         {
             public int Cursor { get; set; }
             public float TopOffset { get; set; }
-            public float ParagraphHeight { get; set; }
         }
         private readonly ReadSetting setting;
         private CacheContentManager cache;
@@ -34,7 +33,6 @@ namespace PureReader.Drawables
         public void FixContents()
         {
             previousInfo.TopOffset = temp.TopOffset;
-            previousInfo.ParagraphHeight = temp.ParagraphHeight;
             previousInfo.Cursor = temp.Cursor;
         }
 
@@ -58,7 +56,7 @@ namespace PureReader.Drawables
         {
             var size = canvas.GetStringSize(text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
             var rows = (int)((Math.Floor(size.Width) / (canvasWidth)) + 1);
-            return setting.LineSpacing * rows;
+            return setting.FontSize * rows;
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -67,6 +65,7 @@ namespace PureReader.Drawables
             canvas.FontSize = setting.FontSize;
             var topOffset = previousInfo.TopOffset + DragOffset;
             var index = previousInfo.Cursor;
+            Debug.WriteLine($"TopOffset: {topOffset}, DragOffset: {DragOffset}, Cursor: {index}");
             while (topOffset > 0)
             {
                 index -= 1;
@@ -93,10 +92,10 @@ namespace PureReader.Drawables
                 {
                     temp.TopOffset = topOffset;
                     temp.Cursor = line.LineIndex;
-                    temp.ParagraphHeight = height + setting.LineSpacing;
                     firstLine = false;
+                    Debug.WriteLine($"First TopOffset: {topOffset}, Cursor: {line.LineIndex}");
                 }
-                canvas.DrawString(line.Text, 0, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, 100);
+                canvas.DrawString(line.Text, 0, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, setting.LineSpacing);
                 topOffset += height + setting.LineSpacing;
                 if (topOffset > dirtyRect.Height)
                 {
@@ -114,7 +113,6 @@ namespace PureReader.Drawables
             previousInfo = new PreviousInfo
             {
                 TopOffset = 0,
-                ParagraphHeight = 0,
                 Cursor = currentBook.LineCursor
             };
         }

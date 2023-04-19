@@ -21,7 +21,7 @@
             </DataTemplate>
         </CollectionView.ItemTemplate>
     </CollectionView>-->
-    <Grid BindingContext="{x:Reference this}">
+    <Grid Padding="10" BindingContext="{x:Reference this}">
         <GraphicsView x:Name="Graphics"
                       DragInteraction="Graphics_DragInteraction"
                       Drawable="{Binding Drawer}"
