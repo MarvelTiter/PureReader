@@ -43,6 +43,7 @@ namespace PureReader.ViewModels
         async void SaveProgress(int cursor)
         {
             Current.LineCursor = cursor;
+            Progress = Current.FormatProgress;
             await bookService.UpdateBookProgress(Current);
         }
 

@@ -55,7 +55,10 @@
                                                 EventName="Scrolled" />
             </CollectionView.Behaviors>
         </CollectionView>-->
-        <!--<Grid Grid.Row="1"
+        <local:TxtReaderView Command="{Binding SaveProgressCommand}"
+                             CurrentBook="{Binding Current}"
+                             Service="{Binding Service}" />
+        <Grid Grid.Row="1"
               Padding="10,0"
               BackgroundColor="#55ffffff"
               ColumnDefinitions="*,Auto">
@@ -63,9 +66,6 @@
             <Label Grid.Column="1"
                    FontSize="12"
                    Text="{Binding Progress}" />
-        </Grid>-->
-        <local:TxtReaderView Command="{Binding SaveProgressCommand}"
-                             CurrentBook="{Binding Current}"
-                             Service="{Binding Service}" />
+        </Grid>
     </Grid>
 </ContentPage>
