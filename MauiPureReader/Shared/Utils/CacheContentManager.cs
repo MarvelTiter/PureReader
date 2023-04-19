@@ -6,12 +6,13 @@ using System.Text;
 
 namespace Shared.Utils
 {
-    internal class CacheContentManager
+    public class CacheContentManager
     {
         private readonly Book book;
         private readonly BookService service;
         private Queue<Content> forward;
         private Stack<Content> previous;
+        private IList<Content> caches;
         int forwardIndex;
         int previousIndex;
         const int FIRST_LOAD = 50;
@@ -26,22 +27,19 @@ namespace Shared.Utils
             previousIndex = book.LineCursor;
             forward = new Queue<Content>();
             previous = new Stack<Content>();
+            Init();
         }
 
-        public async Task<IList<Content>> Init()
+        public async void Init()
         {
-            var contents = await service.GetBookContents(book.Id, forwardIndex, FIRST_LOAD);
-            if (contents.Count < FIRST_LOAD)
+            var contents = await service.GetBookContents(book.Id, book.LineCursor, CACHE_SIZE);
+            if (contents.Count < CACHE_SIZE)
             {
-                await Task.Delay(100);
-                return await Init();
+                Init();
             }
             else
             {
-                forwardIndex += FIRST_LOAD;
-                CheckPreviousCache();
-                CheckForwardCache();
-                return contents;
+                caches = contents;
             }
         }
 
@@ -49,8 +47,9 @@ namespace Shared.Utils
         {
             TaskHelper.Run(nameof(CheckForwardCache), async token =>
             {
-                if (forward.Count < CACHE_LIMIT && forwardIndex < book.Lines)
+                while (forward.Count < CACHE_LIMIT && forwardIndex < book.Lines)
                 {
+                    if (token.IsCancellationRequested) break;
                     var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
                     forwardIndex = contents.Last().LineIndex + 1;
                     foreach (var item in contents)
@@ -60,35 +59,41 @@ namespace Shared.Utils
                 }
             });
         }
-        private void UpdateForwardCache()
+
+        public IEnumerable<Content> GetContents(int start)
         {
-            TaskHelper.Run(nameof(UpdateForwardCache), async token =>
+            if (caches == null) yield break;
+            foreach (var item in caches.Where(c => c.LineIndex >= start))
             {
-                var contents = await service.GetBookContents(book.Id, forwardIndex, CACHE_SIZE);
-                forwardIndex = contents.Last().LineIndex + 1;
-                forward.Clear();
-                foreach (var item in contents)
-                {
-                    forward.Enqueue(item);
-                }
-            });
-        }
-        public IEnumerable<Content> LoadForwardContent(int count)
-        {
-            while (forward.Count > 0 && count > 0)
-            {
-                yield return forward.Dequeue();
-                count--;
+                yield return item;
             }
-            CheckForwardCache();
+        }
+
+        public bool GetForward(out Content forward)
+        {
+            if (this.forward.Count > 0)
+            {
+                forward = this.forward.Dequeue();
+                CheckForwardCache();
+                return true;
+            }
+            else
+            {
+                forward = null;
+                return false;
+            }
         }
 
         private void CheckPreviousCache()
         {
             TaskHelper.Run(nameof(CheckPreviousCache), async token =>
             {
-                if (previous.Count < CACHE_SIZE && previousIndex > 0)
+                while (previous.Count < CACHE_SIZE && previousIndex > 0)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
                     var old = previous.Reverse().ToList();
                     var start = previousIndex - CACHE_SIZE;
                     var count = start < 0 ? start + CACHE_SIZE : CACHE_SIZE;
@@ -99,46 +104,6 @@ namespace Shared.Utils
                     foreach (var item in old) previous.Push(item);
                 }
             });
-        }
-        private void UpdatePreviousCache()
-        {
-            TaskHelper.Run(nameof(UpdatePreviousCache), async token =>
-            {
-                var start = previousIndex - CACHE_SIZE;
-                var count = start < 0 ? start + CACHE_SIZE : CACHE_SIZE;
-                var contents = await service.GetBookContents(book.Id, start, count);
-                previous.Clear();
-                foreach (var item in contents) previous.Push(item);
-            });
-        }
-        public IEnumerable<Content> LoadPreviousContent(int count)
-        {
-            while (previous.Count > 0 && count > 0)
-            {
-                yield return previous.Pop();
-                count--;
-            }
-            CheckPreviousCache();
-        }
-
-        internal void FixedIndex(bool head, int index)
-        {
-            if (head)
-            {
-                /*
-                 * 往下翻，更新前面缓存
-                 */
-                previousIndex = index;
-                UpdatePreviousCache();
-            }
-            else
-            {
-                /*
-                 * 往上翻，更新后面的缓存
-                 */
-                forwardIndex = index;
-                UpdateForwardCache();
-            }
         }
     }
 }

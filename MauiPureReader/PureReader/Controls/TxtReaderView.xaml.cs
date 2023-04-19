@@ -36,51 +36,39 @@ public partial class TxtReaderView : ContentView
 
     public TxtDrawable Drawer { get; set; } = new TxtDrawable(new ReadSetting());
 
-    private async void Init()
+    private void Init()
     {
         if (CurrentBook == null || Service == null) return;
-        System.Diagnostics.Debug.WriteLine("Init......................");
-        var contents = await Service.GetBookContents(CurrentBook.Id, 0, 100);
-        Drawer.UpdateContents(contents);
+        Drawer.CacheMsg = new Shared.Utils.CacheContentManager(CurrentBook, Service);
+        Drawer.PreviousInfo = (0, CurrentBook.LineCursor);
     }
 
     public TxtReaderView()
     {
         InitializeComponent();
     }
-    double offset;
-    int preIndex = -1;
-    private void Wrapper_Scrolled(object sender, ItemsViewScrolledEventArgs e)
-    {
-        offset = e.VerticalOffset;
-        if (e.FirstVisibleItemIndex != preIndex)
-        {
-            preIndex = e.FirstVisibleItemIndex;
-        }
-    }
 
-    private void GraphicsView_Loaded(object sender, EventArgs e)
-    {
-        System.Diagnostics.Debug.WriteLine("GraphicsView_Loaded......................");
-        var g = sender as GraphicsView;
-        g.Invalidate();
-    }
     bool enableDrag = false;
+    PointF start;
     private void Graphics_StartInteraction(object sender, TouchEventArgs e)
     {
+        if (e.Touches.Length != 1) return;
         enableDrag = true;
-        Debug.WriteLine($"Tap Start: {e.Touches[0]}");
+        start = e.Touches[0];
     }
 
     private void Graphics_DragInteraction(object sender, TouchEventArgs e)
     {
         if (!enableDrag) return;
-        Debug.WriteLine($"Drag: {e.Touches[0]}");
+        var offset = e.Touches[0] - start;
+        if (!Drawer.CanDraw(offset.Height)) return;
+        Drawer.DragOffset = offset.Height;
+        Graphics.Invalidate();
     }
 
     private void Graphics_EndInteraction(object sender, TouchEventArgs e)
     {
         enableDrag = false;
-        Debug.WriteLine($"Tap End: {e.Touches[0]}");
+        Drawer.FixContents();
     }
 }

@@ -25,8 +25,8 @@ namespace PureReader.ViewModels
         private Book current;
         [ObservableProperty]
         private string fileContent;
-        [ObservableProperty]
-        private ObservableCollection<Content> contents;
+        //[ObservableProperty]
+        //private ObservableCollection<Content> contents;
         [ObservableProperty]
         private bool loading;
         private const int REMAIN_COUNT = 20;
@@ -38,112 +38,111 @@ namespace PureReader.ViewModels
         [ObservableProperty]
         private string progress;
         //Rect ViewRect => Shell.Current.CurrentPage.Bounds;
-        int ContentCount => Contents.Count;
+        //int ContentCount => Contents.Count;
         public BookService Service => bookService;
         CancellationTokenSource source;
         public ReadViewModel(IFileHandler fileHandler, BookService bookService)
         {
             this.fileHandler = fileHandler;
             this.bookService = bookService;
-            Contents = new ObservableCollection<Content>();
+            //Contents = new ObservableCollection<Content>();
         }
 
         int preIndex = -1;
-        [RelayCommand]
-        private void HandleScroll(ItemsViewScrolledEventArgs e)
-        {
-            if (Math.Abs(e.VerticalDelta) > 50 || Loading || e.FirstVisibleItemIndex >= ContentCount) return;
-            if (e.FirstVisibleItemIndex != preIndex)
-            {
-                preIndex = e.FirstVisibleItemIndex;
-                Current.LineCursor = Contents[e.FirstVisibleItemIndex].LineIndex;
-                //Progress = Current.FormatProgress;
-                if (e.VerticalDelta > 0)
-                {
-                    CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
-                }
-                else
-                {
-                    CheckPreviousAndLoad(e.FirstVisibleItemIndex, e.VerticalDelta);
-                }
-            }
-        }
+        //[RelayCommand]
+        //private void HandleScroll(ItemsViewScrolledEventArgs e)
+        //{
+        //    if (Math.Abs(e.VerticalDelta) > 50 || Loading || e.FirstVisibleItemIndex >= ContentCount) return;
+        //    if (e.FirstVisibleItemIndex != preIndex)
+        //    {
+        //        preIndex = e.FirstVisibleItemIndex;
+        //        Current.LineCursor = Contents[e.FirstVisibleItemIndex].LineIndex;
+        //        //Progress = Current.FormatProgress;
+        //        if (e.VerticalDelta > 0)
+        //        {
+        //            CheckRemainAndLoad(e.LastVisibleItemIndex, e.VerticalDelta);
+        //        }
+        //        else
+        //        {
+        //            CheckPreviousAndLoad(e.FirstVisibleItemIndex, e.VerticalDelta);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 检查剩余多少项，并按需加载
         /// </summary>
         /// <param name="lastVisibleItemIndex"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void CheckRemainAndLoad(int lastVisibleItemIndex, double delta)
-        {
-            Loading = true;
-            TaskHelper.Run(nameof(CheckRemainAndLoad), token =>
-            {
-                if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
-                {
-                    var needToRender = cache.LoadForwardContent(APPEND_COUNT);
-                    foreach (var item in needToRender)
-                    {
-                        Contents.Add(item);
-                    }
-                    if (ContentCount > MAX_CONTENT && false)
-                    {
-                        while (ContentCount > MIN_CONTENT)
-                        {
-                            Contents.RemoveAt(0);
-                        }
-                        cache.FixedIndex(true, Contents.FirstOrDefault()?.LineIndex ?? 0);
-                    }
-                }
-                Loading = false;
-            });
-        }
-        private void CheckPreviousAndLoad(int firstVisibleItemIndex, double delta)
-        {
-            Loading = true;
-            TaskHelper.Run(nameof(CheckPreviousAndLoad), token =>
-            {
-                if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
-                {
-                    var needToRender = cache.LoadPreviousContent(APPEND_COUNT);
-                    foreach (var item in needToRender)
-                    {
-                        Contents.Insert(0, item);
-                    }
-                    if (ContentCount > MAX_CONTENT && false)
-                    {
-                        while (ContentCount > MIN_CONTENT)
-                        {
-                            Contents.RemoveAt(ContentCount - 1);
-                        }
-                        cache.FixedIndex(false, Contents.Last().LineIndex + 1);
-                    }
-                }
-                Loading = false;
-            });
-        }
+        //private void CheckRemainAndLoad(int lastVisibleItemIndex, double delta)
+        //{
+        //    Loading = true;
+        //    TaskHelper.Run(nameof(CheckRemainAndLoad), token =>
+        //    {
+        //        if (ContentCount - (lastVisibleItemIndex + 1) < REMAIN_COUNT)
+        //        {
+        //            var needToRender = cache.LoadForwardContent(APPEND_COUNT);
+        //            foreach (var item in needToRender)
+        //            {
+        //                Contents.Add(item);
+        //            }
+        //            if (ContentCount > MAX_CONTENT && false)
+        //            {
+        //                while (ContentCount > MIN_CONTENT)
+        //                {
+        //                    Contents.RemoveAt(0);
+        //                }
+        //                cache.FixedIndex(true, Contents.FirstOrDefault()?.LineIndex ?? 0);
+        //            }
+        //        }
+        //        Loading = false;
+        //    });
+        //}
+        //private void CheckPreviousAndLoad(int firstVisibleItemIndex, double delta)
+        //{
+        //    Loading = true;
+        //    TaskHelper.Run(nameof(CheckPreviousAndLoad), token =>
+        //    {
+        //        if (firstVisibleItemIndex + 1 <= REMAIN_COUNT)
+        //        {
+        //            var needToRender = cache.LoadPreviousContent(APPEND_COUNT);
+        //            foreach (var item in needToRender)
+        //            {
+        //                Contents.Insert(0, item);
+        //            }
+        //            if (ContentCount > MAX_CONTENT && false)
+        //            {
+        //                while (ContentCount > MIN_CONTENT)
+        //                {
+        //                    Contents.RemoveAt(ContentCount - 1);
+        //                }
+        //                cache.FixedIndex(false, Contents.Last().LineIndex + 1);
+        //            }
+        //        }
+        //        Loading = false;
+        //    });
+        //}
         
-        CacheContentManager cache;
-        public override async Task OnNavigatedTo()
+        //CacheContentManager cache;
+        public override Task OnNavigatedTo()
         {
-            Contents.Clear();
             if (!Current.Done)
             {
                 // 继续解析
                 source = new CancellationTokenSource();
                 _ = fileHandler.Solve(Current, source.Token);
             }
-            cache = new CacheContentManager(Current, bookService);
-            var contents = await cache.Init();
-            foreach (var item in contents)
-            {
-                Contents.Add(item);
-            }
+            //cache = new CacheContentManager(Current, bookService);
+            //var contents = await cache.Init();
+            //foreach (var item in contents)
+            //{
+            //    Contents.Add(item);
+            //}
+            return Task.CompletedTask;
         }
 
         public override async Task OnNavigatedFrom()
         {
-            Contents.Clear();
             source?.Cancel();
             source?.Dispose();
             //await bookService.UpdateBookInfo(Current);

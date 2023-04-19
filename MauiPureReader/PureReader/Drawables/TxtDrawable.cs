@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Maui.Graphics;
 using Shared.Data;
+using Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,39 +26,66 @@ namespace PureReader.Drawables
 
     public class TxtDrawable : IDrawable
     {
-        private IEnumerable<Content> lines;
         private readonly ReadSetting setting;
         float topOffset = 0f;
-
-        public void UpdateContents(IEnumerable<Content> lines) => this.lines = lines;
-
-        public TxtDrawable(IEnumerable<Content> lines, ReadSetting setting)
+        public float DragOffset { get; set; }
+        public CacheContentManager CacheMsg { get; set; }
+        public TxtDrawable(ReadSetting setting)
         {
-            this.lines = lines;
             this.setting = setting;
         }
-        public TxtDrawable(ReadSetting setting) : this(Enumerable.Empty<Content>(), setting)
+
+        Dictionary<int, float> position = new Dictionary<int, float>();
+        int lineCursor = 0;
+        public void FixContents()
         {
+
         }
+
+        /// <summary>
+        /// 判断是否可以滑动重绘
+        /// </summary>
+        /// <param name="delta">滑动偏移量，大于0，往下滑动，小于0，往上滑动</param>
+        /// <returns></returns>
+        public bool CanDraw(float delta)
+        {
+            return true;
+        }
+
+        public (float FirstOffset, int Cursor) PreviousInfo { get; set; } = (0, 0);
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
+            if (CacheMsg == null) return;
             canvas.FontSize = setting.FontSize;
-            foreach (var line in lines)
+            topOffset += DragOffset;
+            var index = PreviousInfo.Cursor;
+            if (topOffset > 0)
             {
-                //var head = canvas.GetStringSize("开头", setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
+
+            }
+            var contents = CacheMsg.GetContents(index);
+
+            foreach (var line in contents)
+            {
                 var sSize = canvas.GetStringSize(line.Text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
                 var rows = (int)((Math.Floor(sSize.Width) / (dirtyRect.Width)) + 1);
                 var height = (setting.LineSpacing) * rows;
-                if (line.Text.Contains("妖魔鬼怪"))
+                if (topOffset + height < 0)
                 {
-                    Debug.WriteLine(sSize);
-                    Debug.WriteLine(dirtyRect);
+                    topOffset += height + setting.LineSpacing;
+                    continue;
                 }
+                //Debug.WriteLine($"TopOffset: {topOffset}, Index: {line.LineIndex}");
                 canvas.DrawString(line.Text, 0, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, 100);
-                //canvas.DrawString(line.Text, 0, topOffset, HorizontalAlignment.Left);
-
                 topOffset += height + setting.LineSpacing;
+                if (topOffset > dirtyRect.Height)
+                {
+
+                    break;
+                }
             }
+
+            //Debug.WriteLine($"End Draw======================================");
         }
     }
 }
