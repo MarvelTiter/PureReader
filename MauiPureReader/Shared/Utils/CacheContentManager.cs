@@ -41,7 +41,10 @@ namespace Shared.Utils
         }
         public IEnumerable<Content> GetContents(int start)
         {
-            if (caches == null) yield break;
+            if (caches == null)
+            {
+                yield break;
+            }
             foreach (var item in caches.Where(c => c.LineIndex >= start))
             {
                 yield return item;

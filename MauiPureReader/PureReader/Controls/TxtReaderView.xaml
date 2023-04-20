@@ -23,6 +23,7 @@
     </CollectionView>-->
     <Grid Padding="10" BindingContext="{x:Reference this}">
         <GraphicsView x:Name="Graphics"
+                      CancelInteraction="Graphics_CancelInteraction"
                       DragInteraction="Graphics_DragInteraction"
                       Drawable="{Binding Drawer}"
                       EndInteraction="Graphics_EndInteraction"

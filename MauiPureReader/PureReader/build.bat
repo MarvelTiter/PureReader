@@ -1,1 +1,1 @@
-dotnet publish -f:net7.0-android -c:Release /p:AndroidSigningKeyPass=ybeluoek3 /p:AndroidSigningStorePass=ybeluoek3
+dotnet publish -f:net7.0-android33.0 -c:Release /p:AndroidSigningKeyPass=ybeluoek3 /p:AndroidSigningStorePass=ybeluoek3

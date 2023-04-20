@@ -82,6 +82,7 @@ namespace PureReader.Drawables
             var contents = cache.GetContents(index);
             foreach (var line in contents)
             {
+                if (string.IsNullOrWhiteSpace(line.Text)) continue;
                 var height = GetParagraphHeight(canvas, line.Text, dirtyRect.Width);
                 if (topOffset + height < 0)
                 {
@@ -105,11 +106,11 @@ namespace PureReader.Drawables
             cache.CheckCacheCapacity(temp.Cursor);
         }
 
-        internal async void Init(Book currentBook, BookService service)
+        internal void Init(Book currentBook, BookService service)
         {
             Current = currentBook;
             cache = new CacheContentManager(currentBook, service);
-            await cache.LoadContentsAsync(currentBook.LineCursor, CancellationToken.None);
+            _ = cache.LoadContentsAsync(currentBook.LineCursor, CancellationToken.None);
             previousInfo = new PreviousInfo
             {
                 TopOffset = 0,

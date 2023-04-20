@@ -58,6 +58,7 @@ public partial class TxtReaderView : ContentView
 
     bool enableDrag = false;
     PointF? start;
+    float preOffset = 0f;
     private void Graphics_StartInteraction(object sender, TouchEventArgs e)
     {
         if (e.Touches.Length != 1) return;
@@ -70,6 +71,8 @@ public partial class TxtReaderView : ContentView
         if (!start.HasValue) return;
         var offset = e.Touches[0] - start.Value;
         if (!Drawer.CanDraw(offset.Height)) return;
+        if (Math.Abs(offset.Height - preOffset) < 1) return;
+        preOffset = offset.Height;
         Drawer.DragOffset = offset.Height;
         Graphics.Invalidate();
     }
@@ -78,6 +81,16 @@ public partial class TxtReaderView : ContentView
     {
         enableDrag = false;
         start = null;
+        preOffset = 0f;
+        Drawer.FixContents();
+        Command?.Execute(Drawer.Cursor);
+    }
+
+    private void Graphics_CancelInteraction(object sender, EventArgs e)
+    {
+        enableDrag = false;
+        start = null;
+        preOffset = 0f;
         Drawer.FixContents();
         Command?.Execute(Drawer.Cursor);
     }
