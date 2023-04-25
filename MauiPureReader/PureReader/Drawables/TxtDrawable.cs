@@ -34,6 +34,7 @@ namespace PureReader.Drawables
         {
             previousInfo.TopOffset = temp.TopOffset;
             previousInfo.Cursor = temp.Cursor;
+            cache.CheckCacheCapacity(temp.Cursor);
         }
 
         /// <summary>
@@ -54,9 +55,11 @@ namespace PureReader.Drawables
 
         private float GetParagraphHeight(ICanvas canvas, string text, float canvasWidth)
         {
-            var size = canvas.GetStringSize(text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
-            var rows = (int)((Math.Floor(size.Width) / (canvasWidth)) + 1);
-            return setting.FontSize * rows;
+            //var size = canvas.GetStringSize(text, setting.Font, setting.FontSize, HorizontalAlignment.Left, VerticalAlignment.Top);
+            //var rows = (int)((Math.Floor(size.Width) / (canvasWidth)) + 1);
+            //return setting.FontSize * rows;
+            var rows = (int)((text.Length * setting.FontSize + (text.Length - 1) * setting.FontSpacing) / canvasWidth + 1);
+            return setting.FontSize * rows + setting.LineSpacing * (rows - 1);
         }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -65,7 +68,6 @@ namespace PureReader.Drawables
             canvas.FontSize = setting.FontSize;
             var topOffset = previousInfo.TopOffset + DragOffset;
             var index = previousInfo.Cursor;
-            Debug.WriteLine($"TopOffset: {topOffset}, DragOffset: {DragOffset}, Cursor: {index}");
             while (topOffset > 0)
             {
                 index -= 1;
@@ -86,7 +88,7 @@ namespace PureReader.Drawables
                 var height = GetParagraphHeight(canvas, line.Text, dirtyRect.Width);
                 if (topOffset + height < 0)
                 {
-                    topOffset += height + setting.LineSpacing;
+                    topOffset += height + setting.ParagraphSpacing;
                     continue;
                 }
                 if (firstLine)
@@ -94,16 +96,27 @@ namespace PureReader.Drawables
                     temp.TopOffset = topOffset;
                     temp.Cursor = line.LineIndex;
                     firstLine = false;
-                    Debug.WriteLine($"First TopOffset: {topOffset}, Cursor: {line.LineIndex}");
                 }
-                canvas.DrawString(line.Text, 0, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, setting.LineSpacing);
-                topOffset += height + setting.LineSpacing;
+                int column = 0;
+                foreach (var c in line.Text)
+                {
+                    var x = column * (setting.FontSize + setting.FontSpacing);
+                    if (x + setting.FontSize  > dirtyRect.Width)
+                    {
+                        column = 0;
+                        x = 0f;
+                        topOffset += setting.FontSize + setting.LineSpacing;
+                    }
+                    //canvas.DrawString(c, x, topOffset, dirtyRect.Width, height, HorizontalAlignment.Left, VerticalAlignment.Top, TextFlow.OverflowBounds, setting.LineSpacing);
+                    canvas.DrawString(c.ToString(), x, topOffset, HorizontalAlignment.Left);
+                    column++;
+                }
+                topOffset += setting.FontSize + setting.ParagraphSpacing;
                 if (topOffset > dirtyRect.Height)
                 {
                     break;
                 }
             }
-            cache.CheckCacheCapacity(temp.Cursor);
         }
 
         internal void Init(Book currentBook, BookService service)
